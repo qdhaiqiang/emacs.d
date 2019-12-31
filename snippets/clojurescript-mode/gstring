@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: gstring
+# key: gstring
+# --
+[goog.string :as gstring]

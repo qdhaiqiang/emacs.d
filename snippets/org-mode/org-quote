@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: org-quote
+# key: <qt
+# --
+#+BEGIN_VERSE
+ $2:text
+
+    ---{$1:author}
+#+END_VERSE

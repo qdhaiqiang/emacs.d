@@ -1,0 +1,10 @@
+# key: >ctl
+# name: kfcontroller
+# --
+;;$1
+(kf/reg-controller
+  :${2:key}
+  {:params (fn [route]
+               (when (-> route :path-params :path (= "/${3:path}")) true))
+   :start (fn [_]
+              (rf/dispatch [:${4:event}]))})

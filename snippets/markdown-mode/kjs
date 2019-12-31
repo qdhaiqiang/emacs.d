@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: kjs
+# key: kjs
+# --
+\`\`\`klipse-js
+$0
+\`\`\`
