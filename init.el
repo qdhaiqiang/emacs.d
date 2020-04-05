@@ -204,6 +204,7 @@
 ;;静态代码检查：https://github.com/borkdude/flycheck-clj-kondo
 (require 'flycheck-clj-kondo)
 
+(setq org-startup-indented t)
 
 ;;marvin-end
 
