@@ -1,0 +1,10 @@
+# key: org
+# name: org-title
+# --
+#+TITLE: ${1:文件名}
+#+AUTHOR: Ma Hai Qiang
+#+EMAIL: qdhaiqiang@163.com
+#+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/2.5.0/
+#+REVEAL-SLIDE-NUMBER: t
+#+REVEAL_THEME: sky
+#+REVEAL_TRANS: linear

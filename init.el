@@ -204,7 +204,14 @@
 ;;静态代码检查：https://github.com/borkdude/flycheck-clj-kondo
 (require 'flycheck-clj-kondo)
 
+(require 'ox-reveal)
 (setq org-startup-indented t)
+(setq org-log-done 'time)
+(setq org-agenda-start-on-weekday 0)
+;;(setq org-ellipsis "⤵")
+
+;;使用 Emacs 发送电子邮件和检查日历
+;;https://linux.cn/article-11932-1-rel.html
 
 ;;marvin-end
 
