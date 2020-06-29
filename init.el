@@ -224,6 +224,10 @@
 ;;安装参考：https://manateelazycat.github.io/emacs/2018/08/08/company-english-helper.html
 (require 'company-english-helper)
 
+;; Or start grip when opening a markdown/org buffer
+(add-hook 'markdown-mode-hook #'grip-mode)
+
+
 ;; Local Variables:
 ;; coding: utf-8
 ;; no-byte-compile: t
