@@ -198,7 +198,18 @@
 
 (add-to-list 'load-path "~/.emacs.d/lisp/neotree")
 (require 'neotree)
-(global-set-key [f8] 'neotree-toggle)
+(defun neotree-project-dir ()
+  "Open NeoTree using the git root."
+  (interactive)
+  (let ((project-dir (projectile-project-root))
+        (file-name (buffer-file-name)))
+    (if project-dir
+        (if (neo-global--window-exists-p)
+            (progn
+              (neotree-dir project-dir)
+              (neo-find file-name)))
+      (message "Could not find git project root."))))
+(global-set-key [f8] 'neotree-project-dir)
 (setq markdown-command "/usr/local/bin/pandoc")
 
 ;;静态代码检查：https://github.com/borkdude/flycheck-clj-kondo
