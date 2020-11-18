@@ -1,0 +1,72 @@
+;;; custom.el --- Load the full configuration -*- lexical-binding: t -*-
+;;; Commentary:
+
+;; This file bootstraps the configuration, which is divided into
+;; a number of other files.
+
+;;; Code:
+;; Produce backtraces when errors occur
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes (quote (sanityinc-tomorrow-blue)))
+ '(custom-safe-themes
+   (quote
+    ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default)))
+ '(package-selected-packages
+   (quote
+    (uptimes dotenv-mode daemons osx-location dsvn htmlize lua-mode gnuplot flycheck-ledger ledger-mode dash-at-point origami regex-tool info-colors flycheck-clojure cider elein cljsbuild-mode clojure-mode slime-company hippie-expand-slime slime cask-mode cl-libify flycheck-package highlight-quoted macrostep cl-lib-highlight aggressive-indent immortal-scratch auto-compile ipretty elisp-slime-nav paredit-everywhere paredit nginx-mode company-terraform terraform-mode docker-compose-mode dockerfile-mode docker yaml-mode toml-mode flycheck-rust racer rust-mode sqlformat projectile-rails yard-mode bundler goto-gem yari robe ruby-compilation inf-ruby rspec-mode ruby-hash-syntax psci psc-ide reformatter purescript-mode flycheck-elm elm-test-runner elm-mode dhall-mode hindent intero haskell-mode company-anaconda anaconda-mode pip-requirements restclient httprepl haml-mode css-eldoc skewer-less sass-mode rainbow-mode tagedit org-pomodoro writeroom-mode org-cliplink grab-mac-link company-php smarty-mode php-mode add-node-modules-path skewer-mode js-comint xref-js2 prettier-js typescript-mode coffee-mode js2-mode json-mode erlang csv-mode markdown-mode textile-mode cmd-to-echo alert ibuffer-projectile github-review forge github-clone bug-reference-github yagist git-commit magit-todos magit git-timemachine gitconfig-mode gitignore-mode git-blamed vc-darcs darcsum browse-at-remote whitespace-cleanup-mode guide-key highlight-escape-sequences whole-line-or-region move-dup page-break-lines multiple-cursors avy expand-region browse-kill-ring symbol-overlay rainbow-delimiters goto-line-preview beacon mode-line-bell vlf list-unicode-display unfill mmm-mode switch-window company-quickhelp company ivy-xref swiper projectile counsel ivy smex flycheck-color-mode-line flycheck ibuffer-vc wgrep-ag ag wgrep anzu diff-hl diredfl disable-mouse default-text-scale ns-auto-titlebar dimmer color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized command-log-mode scratch diminish exec-path-from-shell fullframe seq pdf-tools try grip-mode flycheck-clj-kondo flycheck-pos-tip ox-reveal org-tree-slide calfw uimage 0blayout org-download yasnippet clojure-snippets markdown-preview-mode clj-refactor neotree))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+(global-undo-tree-mode)
+(cnfonts-enable)
+
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+;;(require 'org-bullets)
+;;(add-hook 'org-mode-hook 'org-bullets-mode)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((ditaa . t)
+   (plantuml . t)
+   (dot . t)
+   (clojure . t)
+   ))
+
+
+;;code check tools
+(require 'flycheck-clj-kondo)
+
+(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+
+(require 'yasnippet)
+(yas-global-mode 1)
+
+(setq org-agenda-start-on-weekday 1) ;我喜欢一周以周一做开始
+(setq org-agenda-files (list "~/Library/Mobile Documents/com~apple~CloudDocs/learn/log.org"
+                             "~/git/redcreation/rcpubdoc/早会/record.org"
+                             ))
+
+(setq org-agenda-text-search-extra-files
+      (list "~/org/someday.org"
+            "~/org/config.org"
+            ))
+
+;;通过修改 org-todo-keyword-faces 这个变量可以达到这个目的。例如我们希望 "TODO" 以红色显示，"DOING" 以黄色显示，"DONE" 用绿色显示
+(setq org-todo-keyword-faces '(("TODO" . "red")
+                               ("DOING" . "yellow")
+                               ("DONE" . "green")))
+
+;; End:
+;;; custom.el ends here
