@@ -36,6 +36,7 @@
 ;;(require 'org-bullets)
 ;;(add-hook 'org-mode-hook 'org-bullets-mode)
 
+;;;; org-mode setting beginning
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((ditaa . t)
@@ -44,15 +45,24 @@
    (clojure . t)
    ))
 
+;;;设置jar包路径
+(setq org-plantuml-jar-path
+      (expand-file-name "~/.emacs.d/scripts/plantuml.jar"))
+(setq org-ditaa-jar-path
+      (expand-file-name "~/.emacs.d/scripts/ditaa0_9.jar"))
 
-;;code check tools
-(require 'flycheck-clj-kondo)
+;;;生成图像时不予提示
+(setq org-confirm-babel-evaluate nil)
 
-(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
-  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+;;;预览图像
+(defun bh/display-inline-images ()
+  (condition-case nil
+      (org-display-inline-images)
+    (error nil)))
+(add-hook 'org-babel-after-execute-hook 'bh/display-inline-images 'append)
 
-(require 'yasnippet)
-(yas-global-mode 1)
+                                        ; Make babel results blocks lowercase
+(setq org-babel-results-keyword "results")
 
 (setq org-agenda-start-on-weekday 1) ;我喜欢一周以周一做开始
 (setq org-agenda-files (list "~/Library/Mobile Documents/com~apple~CloudDocs/org-doc/log.org"
@@ -65,10 +75,22 @@
             "~/org/config.org"
             ))
 
-;;通过修改 org-todo-keyword-faces 这个变量可以达到这个目的。例如我们希望 "TODO" 以红色显示，"DOING" 以黄色显示，"DONE" 用绿色显示
+;;;通过修改 org-todo-keyword-faces 这个变量可以达到这个目的。
+;;;例如我们希望 "TODO" 以红色显示，"DOING" 以黄色显示，"DONE" 用绿色显示
 (setq org-todo-keyword-faces '(("TODO" . "red")
                                ("DOING" . "yellow")
                                ("DONE" . "green")))
+
+;;;; org-mode setting end
+
+;;code check tools
+(require 'flycheck-clj-kondo)
+
+(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+
+(require 'yasnippet)
+(yas-global-mode 1)
 
 ;; End:
 ;;; custom.el ends here
