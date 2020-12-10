@@ -45,6 +45,12 @@
    (clojure . t)
    ))
 
+;; 打开 org-indent mode
+(setq org-startup-indented t)
+
+;; 设置 bullet list
+(setq org-bullets-bullet-list '("☰" "☷" "☯" "☭"))
+
 ;;;设置jar包路径
 (setq org-plantuml-jar-path
       (expand-file-name "~/.emacs.d/scripts/plantuml.jar"))
@@ -64,6 +70,7 @@
                                         ; Make babel results blocks lowercase
 (setq org-babel-results-keyword "results")
 
+;;;agenda 模式配置
 (setq org-agenda-start-on-weekday 1) ;我喜欢一周以周一做开始
 (setq org-agenda-files (list "~/Library/Mobile Documents/com~apple~CloudDocs/org-doc/log.org"
                              "~/Library/Mobile Documents/com~apple~CloudDocs/org-doc/learn.org"
@@ -74,6 +81,33 @@
       (list "~/org/someday.org"
             "~/org/config.org"
             ))
+
+;; agenda 里面时间块彩色显示
+;; From: https://emacs-china.org/t/org-agenda/8679/3
+(defun ljg/org-agenda-time-grid-spacing ()
+  "Set different line spacing w.r.t. time duration."
+  (save-excursion
+    (let* ((background (alist-get 'background-mode (frame-parameters)))
+           (background-dark-p (string= background "dark"))
+           (colors (list "#1ABC9C" "#2ECC71" "#3498DB" "#9966ff"))
+           pos
+           duration)
+      (nconc colors colors)
+      (goto-char (point-min))
+      (while (setq pos (next-single-property-change (point) 'duration))
+        (goto-char pos)
+        (when (and (not (equal pos (point-at-eol)))
+                   (setq duration (org-get-at-bol 'duration)))
+          (let ((line-height (if (< duration 30) 1.0 (+ 0.5 (/ duration 60))))
+                (ov (make-overlay (point-at-bol) (1+ (point-at-eol)))))
+            (overlay-put ov 'face `(:background ,(car colors)
+                                                :foreground
+                                                ,(if background-dark-p "black" "white")))
+            (setq colors (cdr colors))
+            (overlay-put ov 'line-height line-height)
+            (overlay-put ov 'line-spacing (1- line-height))))))))
+
+(add-hook 'org-agenda-finalize-hook #'ljg/org-agenda-time-grid-spacing)
 
 ;;;通过修改 org-todo-keyword-faces 这个变量可以达到这个目的。
 ;;;例如我们希望 "TODO" 以红色显示，"DOING" 以黄色显示，"DONE" 用绿色显示
