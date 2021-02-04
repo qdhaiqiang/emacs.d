@@ -210,26 +210,21 @@
               (neo-find file-name)))
       (message "Could not find git project root."))))
 (global-set-key [f8] 'neotree-project-dir)
+
 (setq markdown-command "/usr/local/bin/pandoc")
 
 ;;静态代码检查：https://github.com/borkdude/flycheck-clj-kondo
-(require 'flycheck-clj-kondo)
+;;(require 'flycheck-clj-kondo)
 
-(require 'ox-reveal)
+
 (setq org-startup-indented t)
-(setq org-log-done 'time)
-(setq org-agenda-start-on-weekday 0)
-;;(setq org-ellipsis "⤵")
 
 ;;edebug-like
-(setq cider-lein-parameters "with-profile +1.6 repl :headless")
+;;(setq cider-lein-parameters "with-profile +1.6 repl :headless")
 
 ;;使用 Emacs 发送电子邮件和检查日历
 ;;https://linux.cn/article-11932-1-rel.html
 
-;;marvin-end
-
-(provide 'init)
 
 ;;执行命令 `toggle-company-english-helper’ , 就可以在Emacs中飞速的编写英文文档了
 ;;安装参考：https://manateelazycat.github.io/emacs/2018/08/08/company-english-helper.html
@@ -238,6 +233,9 @@
 ;; Or start grip when opening a markdown/org buffer
 (add-hook 'markdown-mode-hook #'grip-mode)
 
+;;marvin-end
+
+(provide 'init)
 
 ;; Local Variables:
 ;; coding: utf-8

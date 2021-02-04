@@ -19,7 +19,7 @@
  '(desktop-save-mode t)
  '(package-selected-packages
    (quote
-    (uptimes dotenv-mode daemons osx-location dsvn htmlize lua-mode gnuplot flycheck-ledger ledger-mode dash-at-point origami regex-tool info-colors flycheck-clojure cider elein cljsbuild-mode clojure-mode slime-company hippie-expand-slime slime cask-mode cl-libify flycheck-package highlight-quoted macrostep cl-lib-highlight aggressive-indent immortal-scratch auto-compile ipretty elisp-slime-nav paredit-everywhere paredit nginx-mode company-terraform terraform-mode docker-compose-mode dockerfile-mode docker yaml-mode toml-mode flycheck-rust racer rust-mode sqlformat projectile-rails yard-mode bundler goto-gem yari robe ruby-compilation inf-ruby rspec-mode ruby-hash-syntax psci psc-ide reformatter purescript-mode flycheck-elm elm-test-runner elm-mode dhall-mode hindent intero haskell-mode company-anaconda anaconda-mode pip-requirements restclient httprepl haml-mode css-eldoc skewer-less sass-mode rainbow-mode tagedit org-pomodoro writeroom-mode org-cliplink grab-mac-link company-php smarty-mode php-mode add-node-modules-path skewer-mode js-comint xref-js2 prettier-js typescript-mode coffee-mode js2-mode json-mode erlang csv-mode markdown-mode textile-mode cmd-to-echo alert ibuffer-projectile github-review forge github-clone bug-reference-github yagist git-commit magit-todos magit git-timemachine gitconfig-mode gitignore-mode git-blamed vc-darcs darcsum browse-at-remote whitespace-cleanup-mode guide-key highlight-escape-sequences whole-line-or-region move-dup page-break-lines multiple-cursors avy expand-region browse-kill-ring symbol-overlay rainbow-delimiters goto-line-preview beacon mode-line-bell vlf list-unicode-display unfill mmm-mode switch-window company-quickhelp company ivy-xref swiper projectile counsel ivy smex flycheck-color-mode-line flycheck ibuffer-vc wgrep-ag ag wgrep anzu diff-hl diredfl disable-mouse default-text-scale ns-auto-titlebar dimmer color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized command-log-mode scratch diminish exec-path-from-shell fullframe seq pdf-tools try grip-mode flycheck-clj-kondo flycheck-pos-tip ox-reveal org-tree-slide calfw uimage 0blayout org-download yasnippet clojure-snippets markdown-preview-mode clj-refactor neotree))))
+    (yasnippet org-bullets ox-reveal keycast undo-tree cnfonts uptimes dotenv-mode daemons osx-location dsvn htmlize lua-mode gnuplot flycheck-ledger ledger-mode dash-at-point origami regex-tool info-colors flycheck-clojure cider elein cljsbuild-mode clojure-mode slime-company hippie-expand-slime slime cask-mode cl-libify flycheck-package highlight-quoted macrostep cl-lib-highlight aggressive-indent immortal-scratch auto-compile ipretty elisp-slime-nav paredit-everywhere paredit nginx-mode company-terraform terraform-mode docker-compose-mode dockerfile-mode docker yaml-mode toml-mode flycheck-rust racer rust-mode sqlformat projectile-rails yard-mode bundler goto-gem yari robe ruby-compilation inf-ruby rspec-mode ruby-hash-syntax psci psc-ide reformatter purescript-mode flycheck-elm elm-test-runner elm-mode dhall-mode hindent intero haskell-mode company-anaconda anaconda-mode pip-requirements restclient httprepl haml-mode css-eldoc skewer-less sass-mode rainbow-mode tagedit org-pomodoro writeroom-mode org-cliplink grab-mac-link company-php smarty-mode php-mode add-node-modules-path skewer-mode js-comint xref-js2 prettier-js typescript-mode coffee-mode js2-mode json-mode erlang csv-mode markdown-mode textile-mode cmd-to-echo alert ibuffer-projectile github-review forge github-clone bug-reference-github yagist git-commit magit-todos magit git-timemachine gitconfig-mode gitignore-mode git-blamed vc-darcs darcsum browse-at-remote whitespace-cleanup-mode guide-key highlight-escape-sequences whole-line-or-region move-dup page-break-lines multiple-cursors avy expand-region browse-kill-ring symbol-overlay rainbow-delimiters goto-line-preview beacon mode-line-bell vlf list-unicode-display unfill mmm-mode switch-window company-quickhelp company ivy-xref swiper projectile counsel ivy smex flycheck-color-mode-line flycheck ibuffer-vc wgrep-ag ag wgrep anzu diff-hl diredfl disable-mouse default-text-scale ns-auto-titlebar dimmer color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized command-log-mode scratch diminish exec-path-from-shell fullframe seq flycheck-clj-kondo pdf-tools try grip-mode flycheck-pos-tip org-tree-slide calfw uimage 0blayout org-download clojure-snippets markdown-preview-mode clj-refactor neotree))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -29,14 +29,48 @@
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-(global-undo-tree-mode)
+;; 中文对齐
+(require-package 'cnfonts)
 (cnfonts-enable)
 
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-;;(require 'org-bullets)
-;;(add-hook 'org-mode-hook 'org-bullets-mode)
+;; 撤回undotree
+(require-package 'undo-tree)
+(global-undo-tree-mode)
 
-;;;; org-mode setting beginning
+;; 开启换页线
+(global-page-break-lines-mode)
+
+;; 分享快捷键
+(require-package 'keycast)
+
+(add-hook 'clojure-mode-hook
+          (lambda ()
+            (page-break-lines-mode)))
+(add-hook 'clojurescript-mode-hook
+          (lambda ()
+            (page-break-lines-mode)))
+
+;; 80个字符处放置竖线
+(setq-default fill-column 80)
+
+;; org文件生成reveal.js PPT
+(require-package 'ox-reveal)
+(load-library "ox-reveal")
+
+
+;;code check tools
+;; 使用clj-kondo来做clj/cljc/cljs的语法检查, 需要安装clj-kondo,`brew install borkdude/brew/clj-kondo`
+(require 'flycheck-clj-kondo)
+(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+
+;;; org-mode setting beginning
+
+;; 使用org-bullets
+(require-package 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((ditaa . t)
@@ -51,6 +85,7 @@
 
 ;; 设置 bullet list
 (setq org-bullets-bullet-list '("☰" "☷" "☯" "☭"))
+;;(setq org-ellipsis "⤵")
 
 ;;;设置jar包路径
 (setq org-plantuml-jar-path
@@ -68,8 +103,8 @@
     (error nil)))
 (add-hook 'org-babel-after-execute-hook 'bh/display-inline-images 'append)
 
-                                        ; Make babel results blocks lowercase
-(setq org-babel-results-keyword "results")
+;; Make babel results blocks lowercase
+;;(setq org-babel-results-keyword "results")
 
 ;;;agenda 模式配置
 (setq org-agenda-start-on-weekday 1) ;我喜欢一周以周一做开始
@@ -143,13 +178,9 @@
 
 ;;;; org-mode setting end
 
-;;code check tools
-(require 'flycheck-clj-kondo)
+
 
-(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
-  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
-
-(require 'yasnippet)
+(require-package 'yasnippet)
 (yas-global-mode 1)
 
 ;; End:
