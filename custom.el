@@ -70,6 +70,8 @@
 (require-package 'org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
+;;开启自动折行,防止一行文字的长度超出屏幕范围时，行会继续往右延伸而导致部分内容不可见(因在屏幕范围外而无法看见)
+(setq truncate-lines nil)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -145,11 +147,13 @@
 
 (add-hook 'org-agenda-finalize-hook #'ljg/org-agenda-time-grid-spacing)
 
+(setq org-todo-keywords '((sequence "TODO" "DOING" "DONE" "BLOCK")))
 ;;;通过修改 org-todo-keyword-faces 这个变量可以达到这个目的。
 ;;;例如我们希望 "TODO" 以红色显示，"DOING" 以黄色显示，"DONE" 用绿色显示
 (setq org-todo-keyword-faces '(("TODO" . "red")
                                ("DOING" . "yellow")
-                               ("DONE" . "green")))
+                               ("DONE" . "green")
+                               ("BLOCK" . "blue")))
 
 ;;;;插动图片到org 文件时， 自动将文件放到org下的imgs/下，并插入[[file:…imgs/image.jpg]]
 (defun vmacs-org-insert-image (event)
