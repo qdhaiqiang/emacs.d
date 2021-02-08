@@ -153,7 +153,7 @@
 (setq org-todo-keyword-faces '(("TODO" . "red")
                                ("DOING" . "yellow")
                                ("DONE" . "green")
-                               ("BLOCK" . "blue")))
+                               ("BLOCK" . (:foreground "blue" :weight bold))))
 
 ;;;;插动图片到org 文件时， 自动将文件放到org下的imgs/下，并插入[[file:…imgs/image.jpg]]
 (defun vmacs-org-insert-image (event)
