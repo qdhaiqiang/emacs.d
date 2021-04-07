@@ -231,7 +231,7 @@
 (require 'company-english-helper)
 
 ;; Or start grip when opening a markdown/org buffer
-(add-hook 'markdown-mode-hook #'grip-mode)
+;;(add-hook 'markdown-mode-hook #'grip-mode)
 
 ;;marvin-end
 
