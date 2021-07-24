@@ -175,6 +175,7 @@
 ;;marvin-start
 (setq auto-image-file-mode t)    ;;;;让 Emacs 可以直接打开和显示图片。
 (add-to-list 'load-path "~/.emacs.d/lisp")    ;;之定义的.el配置配置文件放这里然后require一下就行
+(add-to-list 'load-path "~/.emacs.d/orgdir/lisp" t)
 
 (setq-default cursor-type 'bar) ;; 设置光标为竖条
 
