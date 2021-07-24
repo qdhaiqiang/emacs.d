@@ -184,8 +184,8 @@
 (require-package 'lsp-java)
 
 ;; 按 <C-c f> 扩大选中区域，按 <C-c b> 缩小选中区域
-(global-set-key (kbd "C-c f") 'er/expand-region)
-(global-set-key (kbd "C-c b") 'er/contract-region)
+(global-set-key (kbd "C-= C-=") 'er/expand-region)
+(global-set-key (kbd "C-= C--") 'er/contract-region)
 
 
 (require 'ob-sql)
