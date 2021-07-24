@@ -5,7 +5,7 @@
 ;; save a list of open files in ~/.emacs.d/.emacs.desktop
 (setq desktop-path (list user-emacs-directory)
       desktop-auto-save-timeout 600)
-;;(desktop-save-mode 1)
+(desktop-save-mode 1)
 
 (defun sanityinc/desktop-time-restore (orig &rest args)
   (let ((start-time (current-time)))
@@ -27,9 +27,9 @@
                  (abbreviate-file-name filename))))))
 (advice-add 'desktop-create-buffer :around 'sanityinc/desktop-time-buffer-create)
 
-;;----------------------------------------------------------------------------
+
 ;; Restore histories and registers after saving
-;;----------------------------------------------------------------------------
+
 (setq-default history-length 1000)
 (add-hook 'after-init-hook 'savehist-mode)
 

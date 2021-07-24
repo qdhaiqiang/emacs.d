@@ -2,36 +2,12 @@
 ;;; Commentary:
 ;;; Code:
 
+(setq-default debugger-bury-or-kill 'kill)
+
 (require-package 'elisp-slime-nav)
 (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
   (add-hook hook 'turn-on-elisp-slime-nav-mode))
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq mode-name "ELisp")))
-
-
-(defun no-bug ()
-  (concat "////////////////////////////////////////////////////////////////////\n"
-          "//                          _ooOoo_                               //\n"
-          "//                         o8888888o                              //\n"
-          "//                         88""  .  ""88                              //\n"
-          "//                         (| ^_^ |)                              //\n"
-          "//                         O\\  =  /O                              //\n"
-          "//                      ____/'---'\\____                           //\n"
-          "//                    .'  \\\\|     |//  `.                         //\n"
-          "//                   /  \\\\|||  :  |||//  \\                        //\n"
-          "//                  /  _||||| -:- |||||-  \\                       //\n"
-          "//                  |   | \\\\\\  -  /// |   |                       //\n"
-          "//                  | \\_|  ''\\---/''  |   |                       //\n"
-          "//                  \\  .-\\__  `-`  ___/-. /                       //\n"
-          "//                ___`. .'  /--.--\\  `. . ___                     //\n"
-          "//              .''' '<  `.___\\_<|>_/___.'  >'''.                 //\n"
-          "//            | | :  `- \\`.;`\\ _ /`;.`/ - ` : | |                 //\n"
-          "//            \\  \\ `-.   \\_ __\\ /__ _/   .-` /  /                 //\n"
-          "//      ========`-.____`-.___\\_____/___.-`____.-'========         //\n"
-          "//                           `=---='                              //\n"
-          "//      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^        //\n"
-          "//            佛祖保佑       永不宕机     永无BUG                  //\n"
-          "////////////////////////////////////////////////////////////////////\n")
-  )
 
 (setq-default initial-scratch-message
               (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n"))
@@ -63,8 +39,9 @@
 
 (global-set-key [remap eval-expression] 'pp-eval-expression)
 
-(after-load 'lisp-mode
-  (define-key emacs-lisp-mode-map (kbd "C-x C-e") 'sanityinc/eval-last-sexp-or-region))
+(with-eval-after-load 'lisp-mode
+  (define-key emacs-lisp-mode-map (kbd "C-x C-e") 'sanityinc/eval-last-sexp-or-region)
+  (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'pp-eval-expression))
 
 (when (maybe-require-package 'ipretty)
   (add-hook 'after-init-hook 'ipretty-mode))
@@ -76,6 +53,26 @@
     (with-current-buffer out-buffer-name
       (view-mode 1))))
 (advice-add 'pp-display-expression :after 'sanityinc/make-read-only)
+
+
+
+(defun sanityinc/load-this-file ()
+  "Load the current file or buffer.
+The current directory is temporarily added to `load-path'.  When
+there is no current file, eval the current buffer."
+  (interactive)
+  (let ((load-path (cons default-directory load-path))
+        (file (buffer-file-name)))
+    (if file
+        (progn
+          (save-some-buffers nil (apply-partially 'derived-mode-p 'emacs-lisp-mode))
+          (load-file (buffer-file-name))
+          (message "Loaded %s" file))
+      (eval-buffer)
+      (message "Evaluated %s" (current-buffer)))))
+
+(with-eval-after-load 'lisp-mode
+  (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'sanityinc/load-this-file))
 
 
 
@@ -112,14 +109,13 @@
       (funcall sanityinc/repl-switch-function sanityinc/repl-original-buffer)
     (error "No original buffer")))
 
-(after-load 'elisp-mode
+(with-eval-after-load 'elisp-mode
   (define-key emacs-lisp-mode-map (kbd "C-c C-z") 'sanityinc/switch-to-ielm))
-(after-load 'ielm
+(with-eval-after-load 'ielm
   (define-key ielm-map (kbd "C-c C-z") 'sanityinc/repl-switch-back))
 
-;; ----------------------------------------------------------------------------
+
 ;; Hippie-expand
-;; ----------------------------------------------------------------------------
 
 (defun set-up-hippie-expand-for-elisp ()
   "Locally set `hippie-expand' completion functions for use with Emacs Lisp."
@@ -128,16 +124,17 @@
   (add-to-list 'hippie-expand-try-functions-list 'try-complete-lisp-symbol-partially t))
 
 
-;; ----------------------------------------------------------------------------
+
 ;; Automatic byte compilation
-;; ----------------------------------------------------------------------------
+
 (when (maybe-require-package 'auto-compile)
+  (setq auto-compile-delete-stray-dest nil)
   (add-hook 'after-init-hook 'auto-compile-on-save-mode)
   (add-hook 'after-init-hook 'auto-compile-on-load-mode))
 
-;; ----------------------------------------------------------------------------
+
 ;; Load .el if newer than corresponding .elc
-;; ----------------------------------------------------------------------------
+
 (setq load-prefer-newer t)
 
 
@@ -162,9 +159,9 @@
        " ")))))
 
 
-;; ----------------------------------------------------------------------------
+
 ;; Enable desired features for all lisp modes
-;; ----------------------------------------------------------------------------
+
 (defun sanityinc/enable-check-parens-on-save ()
   "Run `check-parens' when the current buffer is saved."
   (add-hook 'after-save-hook #'check-parens nil t))
@@ -209,13 +206,9 @@
 (add-to-list 'auto-mode-alist '("\\.emacs-project\\'" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("archive-contents\\'" . emacs-lisp-mode))
 
-(require-package 'cl-lib-highlight)
-(after-load 'lisp-mode
-  (cl-lib-highlight-initialize))
 
-;; ----------------------------------------------------------------------------
+
 ;; Delete .elc files when reverting the .el from VC or magit
-;; ----------------------------------------------------------------------------
 
 ;; When .el files are open, we can intercept when they are modified
 ;; by VC or magit in order to remove .elc files that are likely to
@@ -251,8 +244,8 @@
 
 (require-package 'macrostep)
 
-(after-load 'lisp-mode
-  (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand))
+(with-eval-after-load 'lisp-mode
+  (define-key emacs-lisp-mode-map (kbd "C-c x") 'macrostep-expand))
 
 
 
@@ -268,7 +261,7 @@
       (rainbow-mode)))
   (add-hook 'emacs-lisp-mode-hook 'sanityinc/enable-rainbow-mode-if-theme)
   (add-hook 'help-mode-hook 'rainbow-mode)
-  (after-load 'rainbow-mode
+  (with-eval-after-load 'rainbow-mode
     (diminish 'rainbow-mode)))
 
 
@@ -279,18 +272,23 @@
 
 (when (maybe-require-package 'flycheck)
   (require-package 'flycheck-package)
-  (after-load 'flycheck
-    (after-load 'elisp-mode
+  (with-eval-after-load 'flycheck
+    (with-eval-after-load 'elisp-mode
       (flycheck-package-setup))))
 
 
 
 ;; ERT
-(after-load 'ert
+(with-eval-after-load 'ert
   (define-key ert-results-mode-map (kbd "g") 'ert-results-rerun-all-tests))
 
 
 (maybe-require-package 'cl-libify)
+
+
+(maybe-require-package 'flycheck-relint)
+
+
 
 (maybe-require-package 'cask-mode)
 
