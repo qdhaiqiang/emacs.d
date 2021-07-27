@@ -84,9 +84,9 @@
 
 ;;;设置jar包路径
 (setq org-plantuml-jar-path
-      (expand-file-name "~/.emacs.d/scripts/plantuml.jar"))
+      (expand-file-name "~/.emacs.d/jar/plantuml.1.2021.9.jar"))
 (setq org-ditaa-jar-path
-      (expand-file-name "~/.emacs.d/scripts/ditaa0_9.jar"))
+      (expand-file-name "~/.emacs.d/jar/ditaa0_9.jar"))
 
 ;;;生成图像时不予提示
 (setq org-confirm-babel-evaluate nil)
