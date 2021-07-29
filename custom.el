@@ -40,13 +40,17 @@
 (add-hook 'clojurescript-mode-hook
           (lambda ()
             (page-break-lines-mode)))
-
+
 ;; 80个字符处放置竖线
-(setq-default fill-column 80)
+(setq-default fill-column 120)
 
 ;; 区域选择
 (require-package 'expand-region)
+;; 按 <C-c => 扩大选中区域，按 <C-c -> 缩小选中区域
+(global-set-key (kbd "C-=") 'er/expand-region)
+(global-set-key (kbd "C--") 'er/contract-region)
 
+
 ;;; ------------------org-mode setting beginning
 
 ;; org文件生成reveal.js PPT
@@ -182,11 +186,6 @@
 
 ;;java支持：https://segmentfault.com/a/1190000040158765
 (require-package 'lsp-java)
-
-;; 按 <C-c => 扩大选中区域，按 <C-c -> 缩小选中区域
-(global-set-key (kbd "C-=") 'er/expand-region)
-(global-set-key (kbd "C--") 'er/contract-region)
-
 
 (require 'ob-sql)
 
