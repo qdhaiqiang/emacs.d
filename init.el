@@ -204,11 +204,6 @@
 ;;使用 Emacs 发送电子邮件和检查日历
 ;;https://linux.cn/article-11932-1-rel.html
 
-
-;;执行命令 `toggle-company-english-helper’ , 就可以在Emacs中飞速的编写英文文档了
-;;安装参考：https://manateelazycat.github.io/emacs/2018/08/08/company-english-helper.html
-(require 'company-english-helper)
-
 ;; Or start grip when opening a markdown/org buffer
 ;;(add-hook 'markdown-mode-hook #'grip-mode)
 

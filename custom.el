@@ -50,6 +50,14 @@
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C--") 'er/contract-region)
 
+;;执行命令 `toggle-company-english-helper’ , 就可以在Emacs中飞速的编写英文文档了
+;;安装参考：https://manateelazycat.github.io/emacs/2018/08/08/company-english-helper.html
+(require 'company-english-helper)
+
+
+;; 设置magit的log默认显示age为datetime
+(setq magit-log-margin '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
+
 
 ;;; ------------------org-mode setting beginning
 
