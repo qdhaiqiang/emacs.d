@@ -1,0 +1,6 @@
+# key: <s
+# name: org-src
+# --
+#+BEGIN_SRC
+ $1
+#+END_SRC

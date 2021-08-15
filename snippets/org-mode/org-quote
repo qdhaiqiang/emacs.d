@@ -2,8 +2,8 @@
 # name: org-quote
 # key: <qt
 # --
-#+BEGIN_VERSE
+#+BEGIN_QUOTE
  $2:text
 
     ---{$1:author}
-#+END_VERSE
+#+END_QUOTE

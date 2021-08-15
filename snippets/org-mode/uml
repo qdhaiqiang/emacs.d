@@ -2,6 +2,6 @@
 # name: uml
 # key: uml
 # --
-#+BEGIN_SRC plantuml :file /imgs/${1:export-file-name} :cmdline -charset UTF-8
- ${0}
+#+BEGIN_SRC plantuml :file imgs/{$1:export-file-name} :cmdline -charset UTF-8
+ $0
 #+END_SRC
