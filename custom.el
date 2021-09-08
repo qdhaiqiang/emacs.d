@@ -54,7 +54,8 @@
 ;;安装参考：https://manateelazycat.github.io/emacs/2018/08/08/company-english-helper.html
 (require 'company-english-helper)
 
-
+;;代码区块注释
+(global-set-key (kbd "C-c /") 'comment-region)
 ;; 设置magit的log默认显示age为datetime
 (setq magit-log-margin '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
 
