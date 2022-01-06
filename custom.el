@@ -67,12 +67,17 @@
 
 ;;执行命令 `toggle-company-english-helper’ , 就可以在Emacs中飞速的编写英文文档了
 ;;安装参考：https://manateelazycat.github.io/emacs/2018/08/08/company-english-helper.html
-(require 'company-english-helper)
+;;(require 'compan-yenglish-helper)
 
 ;;代码区块注释
 (global-set-key (kbd "C-c /") 'comment-region)
 ;; 设置magit的log默认显示age为datetime
 (setq magit-log-margin '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
+
+
+;;保存时删除尾部空格
+(add-hook 'before-save-hook
+          'delete-trailing-whitespace)
 
 
 ;;; ------------------org-mode setting beginning
@@ -103,8 +108,6 @@
 
 ;; 设置默认不要展开，全部折叠
 (setq org-startup-folded t)
-
-(define-key org-mode-map (kbd "C-c t") 'org-toggle-blocks)
 
 ;; 设置 bullet list
 (setq org-bullets-bullet-list '("☰" "☷" "☯" "☭"))
@@ -168,12 +171,19 @@
 
 (add-hook 'org-agenda-finalize-hook #'ljg/org-agenda-time-grid-spacing)
 
-(setq org-todo-keywords '((sequence "TODO" "DOING" "DONE" "BLOCK")))
+(setq org-todo-keywords
+      '((sequence "BUG(b!)" "|" "FIXED(f!)")
+        (sequence "TODO(t!)" "DOING(i)" "DONE(d!)" "SOMEDAY(s)" "CANCELED(c @/!)" "BLOCK(c @/!)")
+        ))
+;;(setq org-todo-keywords '((sequence "TODO" "DOING" "DONE" "CANCELLED" "BLOCK")))
 ;;;通过修改 org-todo-keyword-faces 这个变量可以达到这个目的。
 ;;;例如我们希望 "TODO" 以红色显示，"DOING" 以黄色显示，"DONE" 用绿色显示
 (setq org-todo-keyword-faces '(("TODO" . "red")
+                               ("BUG" . "red")
                                ("DOING" . "yellow")
                                ("DONE" . "green")
+                               ("FIXED" . "green")
+                               ("CANCELLED" . "red")
                                ("BLOCK" . (:foreground "blue" :weight bold))))
 
 ;;;;插动图片到org 文件时， 自动将文件放到org下的imgs/下，并插入[[file:…imgs/image.jpg]]
@@ -227,5 +237,25 @@
 
 ;; 启动时打开指定文件
 (find-file "~/Library/Mobile Documents/com~apple~CloudDocs/org-doc/log.org")
+
+;;删除快捷键
+(define-key org-mode-map (kbd "M-c") nil)
+
+;;下载远程图片到 Org 文件
+(defun my/org-download-image (link)
+(interactive "sUrl: ")
+(setq filename
+      (concat
+       (make-temp-name
+        (concat (file-name-directory (buffer-file-name))
+                "imgs/" ;; 相对与当前 org 文件的目录，例如如果 org 位于~, 则把文件放到~/imgs/xx.png
+                (format-time-string "%Y%m%d_%H%M%S_")) ) ".png")) ;; 根据时间戳生成文件名
+(shell-command-to-string (format "wget %s -O %s" link filename)) ;; 通过 wget 命令下载图片
+(message "download image success")
+(setq relative-dir (concat "./imgs/" (file-name-nondirectory filename)))
+(if (file-exists-p filename)
+    (insert (concat "#+ATTR_HTML: :width 70%\n[[file:" relative-dir "]]"))) ;; 将图插入到 org 文件中
+)
+
 ;; End:
 ;;; custom.el ends here
