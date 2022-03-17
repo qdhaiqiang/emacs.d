@@ -67,7 +67,7 @@
 (require 'init-hippie-expand)
 (require 'init-company)
 (require 'init-windows)
-;;(require 'init-sessions)
+(require 'init-sessions)
 (require 'init-mmm)
 
 (require 'init-editing-utils)
@@ -179,7 +179,7 @@
 (setq-default cursor-type 'bar) ;; 设置光标为竖条
 
 (require 'auto-save)            ;; 加载自动保存模块
-(auto-save-enable)              ;; 开启自动保存功能
+;;(auto-save-enable)              ;; 开启自动保存功能
 (setq auto-save-slient t)       ;; 自动保存的时候静悄悄的， 不要打扰我
 ;;(tool-bar-mode 0)      ;;禁止工具栏
 ;;(global-linum-mode t) ;;侧边显示行号
