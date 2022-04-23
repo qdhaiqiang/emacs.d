@@ -67,7 +67,7 @@
 (require 'init-hippie-expand)
 (require 'init-company)
 (require 'init-windows)
-(require 'init-sessions)
+;;(require 'init-sessions)
 (require 'init-mmm)
 
 (require 'init-editing-utils)
@@ -172,6 +172,7 @@
 ;;set font
 (add-to-list 'default-frame-alist
              '(font . "Menlo-18"))
+
 ;;marvin-start
 (setq auto-image-file-mode t)    ;;;;让 Emacs 可以直接打开和显示图片。
 (add-to-list 'load-path "~/.emacs.d/lisp")    ;定义的.el配置配置文件放这里然后require一下就行
@@ -188,8 +189,8 @@
 ;; (global-hl-line-mode 1) ;;当前行高亮
 ;;代码折叠：https://blog.csdn.net/pfanaya/article/details/6939310
 
-(require 'px2vw)
-(global-set-key (kbd "C-c w") 'px->vw)
+;;(require 'px2vw)
+;;(global-set-key (kbd "C-c w") 'px->vw)
 
 (setq markdown-command "/usr/local/bin/pandoc")
 
@@ -206,6 +207,10 @@
 
 ;; Or start grip when opening a markdown/org buffer
 ;;(add-hook 'markdown-mode-hook #'grip-mode)
+
+
+(require-package 'swiper)
+
 
 ;;marvin-end
 

@@ -56,6 +56,33 @@
           (lambda ()
             (page-break-lines-mode)))
 
+;; 映射全角字符到半角字符
+(let (
+      ($replacePairs
+       [
+        ["，" ","]
+        ["。" "."]
+        ["；" ";"]
+        ["：" ":"]
+        ["【" "["]
+        ["】" "]"]
+        ["（" "("]
+        ["）" ")"]
+        ["！" "!"]
+        ["、" "\\"]
+        ["／" "/"]
+        ["《" "<"]
+        ["》" ">"]
+        ["‘" "'"]
+        ["’" "'"]
+        ["“" "\""]
+        ["”" "\""]
+        ]
+       ))
+  (mapcar (lambda(x) (define-key key-translation-map
+                       (kbd (elt x 0)) (kbd (elt x 1)))) $replacePairs))
+
+
 ;; 80个字符处放置竖线
 (setq-default fill-column 120)
 
@@ -256,7 +283,8 @@
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes '(sanityinc-tomorrow-blue))
  '(package-selected-packages
-   '(lsp-java yasnippet org-bullets ox-reveal expand-region flycheck-clj-kondo keycast undo-tree cnfonts envrc uptimes shfmt dotenv-mode osx-location htmlize lua-mode gnuplot sudo-edit flycheck-ledger ledger-mode dash-at-point origami regex-tool info-colors flycheck-clojure cider elein cljsbuild-mode clojure-mode slime-company slime cask-mode flycheck-relint cl-libify flycheck-package highlight-quoted macrostep aggressive-indent immortal-scratch auto-compile ipretty elisp-slime-nav paredit nginx-mode company-nixos-options nixos-options nix-buffer nix-sandbox nixpkgs-fmt nix-mode company-terraform terraform-mode docker-compose-mode dockerfile-mode docker yaml-mode flycheck-rust racer rust-mode flycheck-nim nim-mode j-mode dune-format dune merlin-eldoc merlin-company merlin tuareg sqlformat projectile-rails yard-mode bundler yari robe ruby-compilation inf-ruby rspec-mode ruby-hash-syntax psci psc-ide purescript-mode flycheck-elm elm-test-runner elm-mode dhall-mode dante haskell-mode reformatter toml-mode company-anaconda anaconda-mode pip-requirements restclient httprepl haml-mode css-eldoc skewer-less sass-mode rainbow-mode tagedit org-pomodoro writeroom-mode org-cliplink grab-mac-link company-php smarty-mode php-mode add-node-modules-path skewer-mode js-comint coffee-mode xref-js2 prettier-js typescript-mode js2-mode json-mode erlang csv-mode markdown-mode textile-mode crontab-mode alert ibuffer-projectile github-review forge github-clone bug-reference-github yagist git-commit magit-todos magit git-timemachine gitconfig-mode gitignore-mode git-blamed vc-darcs browse-at-remote whitespace-cleanup-mode which-key highlight-escape-sequences whole-line-or-region move-dup page-break-lines multiple-cursors avy browse-kill-ring symbol-overlay rainbow-delimiters beacon mode-line-bell vlf list-unicode-display unfill mmm-mode windswap switch-window company-quickhelp company marginalia consult-flycheck embark-consult projectile consult embark orderless vertico flycheck-color-mode-line flycheck ibuffer-vc wgrep-ag ag wgrep anzu diff-hl diredfl disable-mouse default-text-scale ns-auto-titlebar dimmer color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized command-log-mode scratch diminish exec-path-from-shell gnu-elpa-keyring-update fullframe seq)))
+   '(swiper lsp-java yasnippet org-bullets ox-reveal expand-region flycheck-clj-kondo keycast undo-tree cnfonts envrc uptimes shfmt dotenv-mode osx-location htmlize lua-mode gnuplot sudo-edit flycheck-ledger ledger-mode dash-at-point origami regex-tool info-colors flycheck-clojure cider elein cljsbuild-mode clojure-mode slime-company slime cask-mode flycheck-relint cl-libify flycheck-package highlight-quoted macrostep aggressive-indent immortal-scratch auto-compile ipretty elisp-slime-nav paredit nginx-mode company-nixos-options nixos-options nix-buffer nix-sandbox nixpkgs-fmt nix-mode company-terraform terraform-mode docker-compose-mode dockerfile-mode docker yaml-mode flycheck-rust racer rust-mode flycheck-nim nim-mode j-mode dune-format dune merlin-eldoc merlin-company merlin tuareg sqlformat projectile-rails yard-mode bundler yari robe ruby-compilation inf-ruby rspec-mode ruby-hash-syntax psci psc-ide purescript-mode flycheck-elm elm-test-runner elm-mode dhall-mode dante haskell-mode reformatter toml-mode company-anaconda anaconda-mode pip-requirements restclient httprepl haml-mode css-eldoc skewer-less sass-mode rainbow-mode tagedit org-pomodoro writeroom-mode org-cliplink grab-mac-link company-php smarty-mode php-mode add-node-modules-path skewer-mode js-comint coffee-mode xref-js2 prettier-js typescript-mode js2-mode json-mode erlang csv-mode markdown-mode textile-mode crontab-mode alert ibuffer-projectile github-review forge github-clone bug-reference-github yagist git-commit magit-todos magit git-timemachine gitconfig-mode gitignore-mode git-blamed vc-darcs browse-at-remote whitespace-cleanup-mode which-key highlight-escape-sequences whole-line-or-region move-dup page-break-lines multiple-cursors avy browse-kill-ring symbol-overlay rainbow-delimiters beacon mode-line-bell vlf list-unicode-display unfill mmm-mode windswap switch-window company-quickhelp company marginalia consult-flycheck embark-consult projectile consult embark orderless vertico flycheck-color-mode-line flycheck ibuffer-vc wgrep-ag ag wgrep anzu diff-hl diredfl disable-mouse default-text-scale ns-auto-titlebar dimmer color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized command-log-mode scratch diminish exec-path-from-shell gnu-elpa-keyring-update fullframe seq session))
+ '(session-use-package t nil (session)))
 
 ;; 启用时间显示设置，在minibuffer上面的那个杠上
 (display-time-mode t)
@@ -282,6 +310,28 @@
 (if (file-exists-p filename)
     (insert (concat "#+ATTR_HTML: :width 70%\n[[file:" relative-dir "]]"))) ;; 将图插入到 org 文件中
 )
+
+(global-set-key (kbd "C-s") 'swiper-isearch)
+
+;; 设置agenda 显示中文 月、周、日
+;; https://emacs-china.org/t/agenda/7711/4
+(setq-default
+ ;;inhibit-startup-screen t;隐藏启动显示画面
+ ;; calendar-date-style 'iso
+ calendar-day-abbrev-array ["周七" "周一" "周二" "周三" "周四" "周五" "周六"]
+ calendar-day-name-array ["周七" "周一" "周二" "周三" "周四" "周五" "周六"]
+ calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"]
+ calendar-week-start-day 1
+ org-agenda-deadline-leaders (quote ("最后期限:  " "%3d 天后到期: " "%2d 天前: "))
+ org-agenda-scheduled-leaders (quote ("要事:" "%2d次☞"))
+ ;; ------时间戳汉化------
+ system-time-locale "zh_CN.UTF-8" ;; "C":英文格式
+ org-time-stamp-formats  '("<%Y-%m-%d 周%a>" . "<%Y-%m-%d 周%a %H:%M>")
+ org-display-custom-times t
+ org-time-stamp-custom-formats '("<%Y-%m-%d 周%a>" . "<%Y-%m-%d 周%a %H:%M>")
+ org-deadline-warning-days 2;;最后期限到达前5天即给出警告
+ )
+
 
 ;; End:
 ;;; custom.el ends here
