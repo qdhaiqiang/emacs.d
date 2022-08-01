@@ -174,7 +174,10 @@
              '(font . "Menlo-18"))
 
 ;;marvin-start
-(setq auto-image-file-mode t)    ;;;;让 Emacs 可以直接打开和显示图片。
+(when (not (package-installed-p 'use-package))
+  (package-refresh-contents)
+  (package-install 'use-package))
+
 (add-to-list 'load-path "~/.emacs.d/lisp")    ;定义的.el配置配置文件放这里然后require一下就行
 
 (setq-default cursor-type 'bar) ;; 设置光标为竖条
@@ -198,9 +201,6 @@
 ;;(require 'flycheck-clj-kondo)
 
 (setq org-startup-indented t)
-
-;;edebug-like
-;;(setq cider-lein-parameters "with-profile +1.6 repl :headless")
 
 ;;使用 Emacs 发送电子邮件和检查日历
 ;;https://linux.cn/article-11932-1-rel.html
