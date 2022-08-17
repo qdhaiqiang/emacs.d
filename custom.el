@@ -15,6 +15,10 @@
  ;; If there is more than one, they won't work right.
  )
 
+(require 'dir-treeview)
+(global-set-key (kbd "<f9>") 'dir-treeview)
+(load-theme 'dir-treeview-pleasant t)
+
 ;; 默认启动后最大化
 ;;(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
@@ -83,7 +87,7 @@
                        (kbd (elt x 0)) (kbd (elt x 1)))) $replacePairs))
 
 
-;; 80个字符处放置竖线
+;; 80个字符处放置竖线,对应函数:global-display-fill-column-indicator-mode
 (setq-default fill-column 120)
 
 ;; 区域选择
@@ -284,82 +288,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default bold shadow italic underline bold bold-italic bold])
- '(ansi-color-names-vector
-   (vector "#002451" "#ff9da4" "#d1f1a9" "#ffeead" "#bbdaff" "#ebbbff" "#99ffff" "#ffffff"))
- '(awesome-tray-mode-line-active-color "#0031a9")
- '(awesome-tray-mode-line-inactive-color "#d7d7d7")
- '(beacon-color "#ff9da4")
- '(custom-enabled-themes '(sanityinc-tomorrow-blue))
- '(exwm-floating-border-color "#888888")
- '(fci-rule-color "#003f8e")
- '(flycheck-color-mode-line-face-to-color 'mode-line-buffer-id)
- '(flymake-error-bitmap '(flymake-double-exclamation-mark modus-themes-fringe-red))
- '(flymake-note-bitmap '(exclamation-mark modus-themes-fringe-cyan))
- '(flymake-warning-bitmap '(exclamation-mark modus-themes-fringe-yellow))
- '(frame-background-mode 'dark)
- '(highlight-changes-colors nil)
- '(highlight-changes-face-list '(success warning error bold bold-italic))
- '(hl-todo-keyword-faces
-   '(("HOLD" . "#70480f")
-     ("TODO" . "#721045")
-     ("NEXT" . "#5317ac")
-     ("THEM" . "#8f0075")
-     ("PROG" . "#00538b")
-     ("OKAY" . "#30517f")
-     ("DONT" . "#315b00")
-     ("FAIL" . "#a60000")
-     ("BUG" . "#a60000")
-     ("DONE" . "#005e00")
-     ("NOTE" . "#863927")
-     ("KLUDGE" . "#813e00")
-     ("HACK" . "#813e00")
-     ("TEMP" . "#5f0000")
-     ("FIXME" . "#a0132f")
-     ("XXX+" . "#972500")
-     ("REVIEW" . "#005a5f")
-     ("DEPRECATED" . "#201f55")))
- '(ibuffer-deletion-face 'modus-themes-mark-del)
- '(ibuffer-filter-group-name-face 'modus-themes-pseudo-header)
- '(ibuffer-marked-face 'modus-themes-mark-sel)
- '(ibuffer-title-face 'default)
- '(mini-modeline-face-attr '(:background unspecified))
- '(org-src-block-faces 'nil)
+ '(custom-enabled-themes
+   '(smart-mode-line-dark sanityinc-tomorrow-blue dir-treeview-pleasant))
  '(package-selected-packages
-   '(swiper lsp-java yasnippet org-bullets ox-reveal expand-region flycheck-clj-kondo keycast undo-tree cnfonts envrc uptimes shfmt dotenv-mode osx-location htmlize lua-mode gnuplot sudo-edit flycheck-ledger ledger-mode dash-at-point origami regex-tool info-colors flycheck-clojure cider elein cljsbuild-mode clojure-mode slime-company slime cask-mode flycheck-relint cl-libify flycheck-package highlight-quoted macrostep aggressive-indent immortal-scratch auto-compile ipretty elisp-slime-nav paredit nginx-mode company-nixos-options nixos-options nix-buffer nix-sandbox nixpkgs-fmt nix-mode company-terraform terraform-mode docker-compose-mode dockerfile-mode docker yaml-mode flycheck-rust racer rust-mode flycheck-nim nim-mode j-mode dune-format dune merlin-eldoc merlin-company merlin tuareg sqlformat projectile-rails yard-mode bundler yari robe ruby-compilation inf-ruby rspec-mode ruby-hash-syntax psci psc-ide purescript-mode flycheck-elm elm-test-runner elm-mode dhall-mode dante haskell-mode reformatter toml-mode company-anaconda anaconda-mode pip-requirements restclient httprepl haml-mode css-eldoc skewer-less sass-mode rainbow-mode tagedit org-pomodoro writeroom-mode org-cliplink grab-mac-link company-php smarty-mode php-mode add-node-modules-path skewer-mode js-comint coffee-mode xref-js2 prettier-js typescript-mode js2-mode json-mode erlang csv-mode markdown-mode textile-mode crontab-mode alert ibuffer-projectile github-review forge github-clone bug-reference-github yagist git-commit magit-todos magit git-timemachine gitconfig-mode gitignore-mode git-blamed vc-darcs browse-at-remote whitespace-cleanup-mode which-key highlight-escape-sequences whole-line-or-region move-dup page-break-lines multiple-cursors avy browse-kill-ring symbol-overlay rainbow-delimiters beacon mode-line-bell vlf list-unicode-display unfill mmm-mode windswap switch-window company-quickhelp company marginalia consult-flycheck embark-consult projectile consult embark orderless vertico flycheck-color-mode-line flycheck ibuffer-vc wgrep-ag ag wgrep anzu diff-hl diredfl disable-mouse default-text-scale ns-auto-titlebar dimmer color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized command-log-mode scratch diminish exec-path-from-shell gnu-elpa-keyring-update fullframe seq smart-mode-line smartparens use-package modus-operandi-theme modus-vivendi-theme))
- '(pdf-view-midnight-colors '("#000000" . "#f8f8f8"))
- '(vc-annotate-background nil)
- '(vc-annotate-color-map
-   '((20 . "#ff9da4")
-     (40 . "#ffc58f")
-     (60 . "#ffeead")
-     (80 . "#d1f1a9")
-     (100 . "#99ffff")
-     (120 . "#bbdaff")
-     (140 . "#ebbbff")
-     (160 . "#ff9da4")
-     (180 . "#ffc58f")
-     (200 . "#ffeead")
-     (220 . "#d1f1a9")
-     (240 . "#99ffff")
-     (260 . "#bbdaff")
-     (280 . "#ebbbff")
-     (300 . "#ff9da4")
-     (320 . "#ffc58f")
-     (340 . "#ffeead")
-     (360 . "#d1f1a9")))
- '(vc-annotate-very-old-color nil)
- '(widget-link-prefix "[")
- '(widget-link-suffix "]")
- '(widget-mouse-face '(highlight widget-button))
- '(widget-push-button-prefix "[")
- '(widget-push-button-suffix "]")
- '(window-divider-mode nil)
- '(xterm-color-names
-   ["black" "#a60000" "#005e00" "#813e00" "#0031a9" "#721045" "#00538b" "gray65"])
- '(xterm-color-names-bright
-   ["gray35" "#972500" "#315b00" "#70480f" "#2544bb" "#8f0075" "#30517f" "white"]))
+   '(lsp-java yasnippet org-bullets ox-reveal expand-region flycheck-clj-kondo keycast undo-tree cnfonts envrc uptimes shfmt dotenv-mode osx-location htmlize lua-mode gnuplot sudo-edit flycheck-ledger ledger-mode dash-at-point origami regex-tool info-colors flycheck-clojure cider elein cljsbuild-mode clojure-mode slime-company slime cask-mode flycheck-relint cl-libify flycheck-package highlight-quoted macrostep aggressive-indent immortal-scratch auto-compile ipretty elisp-slime-nav paredit nginx-mode company-nixos-options nixos-options nix-buffer nix-sandbox nixpkgs-fmt nix-mode company-terraform terraform-mode docker-compose-mode dockerfile-mode docker yaml-mode flycheck-rust racer rust-mode flycheck-nim nim-mode j-mode dune-format dune merlin-eldoc merlin-company merlin tuareg sqlformat projectile-rails yard-mode bundler yari robe ruby-compilation inf-ruby rspec-mode ruby-hash-syntax psci psc-ide purescript-mode flycheck-elm elm-test-runner elm-mode dhall-mode dante haskell-mode reformatter toml-mode company-anaconda anaconda-mode pip-requirements restclient httprepl haml-mode css-eldoc skewer-less sass-mode rainbow-mode tagedit org-pomodoro writeroom-mode org-cliplink grab-mac-link company-php smarty-mode php-mode add-node-modules-path skewer-mode js-comint coffee-mode xref-js2 prettier-js typescript-mode js2-mode json-mode erlang csv-mode markdown-mode textile-mode crontab-mode alert ibuffer-projectile github-review forge github-clone bug-reference-github yagist git-commit magit-todos magit git-timemachine gitconfig-mode gitignore-mode git-blamed vc-darcs browse-at-remote whitespace-cleanup-mode which-key highlight-escape-sequences whole-line-or-region move-dup page-break-lines multiple-cursors avy browse-kill-ring symbol-overlay rainbow-delimiters beacon mode-line-bell vlf list-unicode-display unfill mmm-mode windswap switch-window company-quickhelp company marginalia consult-flycheck embark-consult projectile consult embark orderless vertico flycheck-color-mode-line flycheck ibuffer-vc wgrep-ag ag wgrep anzu diff-hl diredfl disable-mouse default-text-scale ns-auto-titlebar dimmer color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized command-log-mode scratch diminish exec-path-from-shell gnu-elpa-keyring-update fullframe seq)))
 
 ;; 启用时间显示设置，在minibuffer上面的那个杠上
 (display-time-mode t)
@@ -383,7 +315,39 @@
     (insert (concat "#+ATTR_HTML: :width 70%\n[[file:" relative-dir "]]"))) ;; 将图插入到 org 文件中
 )
 
-(global-set-key (kbd "C-s") 'swiper-isearch)
+;;(global-set-key (kbd "C-s") 'swiper-isearch)
+;;(require-package 'swiper)
+(use-package swiper
+  :ensure t
+  :bind (("C-s" . swiper-isearch)
+         ("C-r" . swiper-isearch)
+         ("C-c C-r" . ivy-resume)
+         ;;("M-x" . counsel-M-x)
+         ;;("C-x C-f" . counsel-find-file)
+         )
+  :config
+  (progn
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-display-style 'fancy)
+    (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+    ))
+
+;;自动补全配置
+(use-package company
+  :ensure t
+  :config
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 3)
+  (global-company-mode t)
+  )
+
+;;漂亮的间隔线
+(use-package smart-mode-line
+  :config
+  (setq sml/no-confirm-load-theme 1
+        sml/theme 'automatic)
+  (sml/setup))
 
 ;; 设置agenda 显示中文 月、周、日
 ;; https://emacs-china.org/t/agenda/7711/4
@@ -401,9 +365,18 @@
  org-time-stamp-formats  '("<%Y-%m-%d 周%a>" . "<%Y-%m-%d 周%a %H:%M>")
  org-display-custom-times t
  org-time-stamp-custom-formats '("<%Y-%m-%d 周%a>" . "<%Y-%m-%d 周%a %H:%M>")
- org-deadline-warning-days 2;;最后期限到达前5天即给出警告
+ org-deadline-warning-days 2 ;;最后期限到达前5天即给出警告
  )
 
+
+;;设置系统编码
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
+;; 设置垃圾回收阈值,加速启动
+(setq gc-cons-threshold most-positive-fixnum)
 
 ;; End:
 ;;; custom.el ends here
