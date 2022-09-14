@@ -113,6 +113,8 @@
 
 ;;; ------------------org-mode setting beginning
 
+(global-set-key (kbd "<f12>") 'org-agenda)
+
 ;; org文件生成reveal.js PPT
 (require-package 'ox-reveal)
 (load-library "ox-reveal")
@@ -222,8 +224,8 @@
 ;;;例如我们希望 "TODO" 以红色显示，"DOING" 以黄色显示，"DONE" 用绿色显示
 (setq org-todo-keyword-faces '(("TODO" . "red")
                                ("DOING" . "yellow")
-                               ("DONE" . "green")
-                               ("BUG" . "red")
+                               ("DONE" . "forest green")
+                               ("BUG" . "origin")
                                ("FIXED" . "green")
                                ("CANCELLED" . "red")
                                ("BLOCK" . (:foreground "blue" :weight bold))))
