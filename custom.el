@@ -19,6 +19,76 @@
 (global-set-key (kbd "<f9>") 'dir-treeview)
 (load-theme 'dir-treeview-pleasant t)
 
+
+;;(global-set-key (kbd "C-s") 'swiper-isearch)
+;;(require-package 'swiper)
+(use-package swiper
+  :ensure t
+  :bind (("C-s" . swiper-isearch)
+         ("C-r" . swiper-isearch)
+         ("C-c C-r" . ivy-resume)
+         ;;("M-x" . counsel-M-x)
+         ;;("C-x C-f" . counsel-find-file)
+         )
+  :config
+  (progn
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-display-style 'fancy)
+    (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+    ))
+
+;;自动补全配置
+(use-package company
+  :ensure t
+  :config
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 3)
+  (global-company-mode t)
+  )
+
+;;漂亮的间隔线
+(use-package smart-mode-line
+  :config
+  (setq sml/no-confirm-load-theme 1
+        sml/theme 'automatic)
+  (sml/setup))
+
+;;gnuplot绘图工具
+(use-package gnuplot-mode)
+
+;; 设置agenda 显示中文 月、周、日
+;; https://emacs-china.org/t/agenda/7711/4
+(setq-default
+ ;;inhibit-startup-screen t;隐藏启动显示画面
+ ;; calendar-date-style 'iso
+ calendar-day-abbrev-array ["周七" "周一" "周二" "周三" "周四" "周五" "周六"]
+ calendar-day-name-array ["周七" "周一" "周二" "周三" "周四" "周五" "周六"]
+ calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"]
+ calendar-week-start-day 1 ;;设置一周从周一开始
+ org-agenda-deadline-leaders (quote ("最后期限:  " "%3d 天后到期: " "%2d 天前: "))
+ org-agenda-scheduled-leaders (quote ("要事:" "%2d次☞"))
+ ;; ------时间戳汉化------
+ system-time-locale "zh_CN.UTF-8" ;; "C":英文格式
+ org-time-stamp-formats  '("<%Y-%m-%d 周%a>" . "<%Y-%m-%d 周%a %H:%M>")
+ org-display-custom-times t
+ org-time-stamp-custom-formats '("<%Y-%m-%d 周%a>" . "<%Y-%m-%d 周%a %H:%M>")
+ org-deadline-warning-days 2 ;;最后期限到达前5天即给出警告
+ )
+
+
+;;设置系统编码
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
+;; 设置垃圾回收阈值,加速启动
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; 不要自动创建备份文件
+(setq make-backup-files nil)
+
 ;; 默认启动后最大化
 ;;(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
@@ -102,6 +172,7 @@
 
 ;;代码区块注释
 (global-set-key (kbd "C-c /") 'comment-region)
+
 ;; 设置magit的log默认显示age为datetime
 (setq magit-log-margin '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
 
@@ -281,6 +352,58 @@
 
 (setq org-image-actual-width '(800))
 
+(setq org-table-export-default-format "orgtbl-to-csv")
+
+;;下载远程图片到 Org 文件
+(defun my/org-download-image (link)
+  (interactive "sUrl: ")
+  (setq filename
+        (concat
+         (make-temp-name
+          (concat (file-name-directory (buffer-file-name))
+                  "imgs/" ;; 相对与当前 org 文件的目录，例如如果 org 位于~, 则把文件放到~/imgs/xx.png
+                  (format-time-string "%Y%m%d_%H%M%S_")) ) ".png")) ;; 根据时间戳生成文件名
+  (shell-command-to-string (format "wget %s -O %s" link filename)) ;; 通过 wget 命令下载图片
+  (message "download image success")
+  (setq relative-dir (concat "./imgs/" (file-name-nondirectory filename)))
+  (if (file-exists-p filename)
+      (insert (concat "#+ATTR_HTML: :width 70%\n[[file:" relative-dir "]]"))) ;; 将图插入到 org 文件中
+  )
+
+;; ORG 导出 pdf配置
+(setq org-latex-pdf-process '("xelatex -interaction nonstopmode %f"
+                              "xelatex -interaction nonstopmode %f"))
+;; elegantpaper.cls
+;; https://github.com/ElegantLaTeX/ElegantPaper/blob/master/elegantpaper.cls
+(with-eval-after-load 'ox-latex
+  ;; http://orgmode.org/worg/org-faq.html#using-xelatex-for-pdf-export
+  ;; latexmk runs pdflatex/xelatex (whatever is specified) multiple times
+  ;; automatically to resolve the cross-references.
+  (setq org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f %f"))
+  (add-to-list 'org-latex-classes
+               '("elegantpaper"
+                 "\\documentclass[lang=cn]{elegantpaper}
+                 [NO-DEFAULT-PACKAGES]
+                 [PACKAGES]
+                 [EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  (setq org-latex-listings 'minted)
+  (add-to-list 'org-latex-packages-alist '("" "minted")))
+
+;; 生成PDF后清理辅助文件
+;; https://answer-id.com/53623039
+(setq org-latex-logfiles-extensions
+      (quote ("lof" "lot" "tex~" "tex" "aux"
+              "idx" "log" "out" "toc" "nav"
+              "snm" "vrb" "dvi" "fdb_latexmk"
+              "blg" "brf" "fls" "entoc" "ps"
+              "spl" "bbl" "xdv")))
+
+
 ;;;; org-mode setting end
 
 
@@ -311,134 +434,7 @@
 ;;删除快捷键
 (define-key org-mode-map (kbd "M-c") nil)
 
-;;下载远程图片到 Org 文件
-(defun my/org-download-image (link)
-(interactive "sUrl: ")
-(setq filename
-      (concat
-       (make-temp-name
-        (concat (file-name-directory (buffer-file-name))
-                "imgs/" ;; 相对与当前 org 文件的目录，例如如果 org 位于~, 则把文件放到~/imgs/xx.png
-                (format-time-string "%Y%m%d_%H%M%S_")) ) ".png")) ;; 根据时间戳生成文件名
-(shell-command-to-string (format "wget %s -O %s" link filename)) ;; 通过 wget 命令下载图片
-(message "download image success")
-(setq relative-dir (concat "./imgs/" (file-name-nondirectory filename)))
-(if (file-exists-p filename)
-    (insert (concat "#+ATTR_HTML: :width 70%\n[[file:" relative-dir "]]"))) ;; 将图插入到 org 文件中
-)
 
-;;(global-set-key (kbd "C-s") 'swiper-isearch)
-;;(require-package 'swiper)
-(use-package swiper
-  :ensure t
-  :bind (("C-s" . swiper-isearch)
-         ("C-r" . swiper-isearch)
-         ("C-c C-r" . ivy-resume)
-         ;;("M-x" . counsel-M-x)
-         ;;("C-x C-f" . counsel-find-file)
-         )
-  :config
-  (progn
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t)
-    (setq ivy-display-style 'fancy)
-    (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-    ))
-
-;;自动补全配置
-(use-package company
-  :ensure t
-  :config
-  (setq company-idle-delay 0)
-  (setq company-minimum-prefix-length 3)
-  (global-company-mode t)
-  )
-
-;;漂亮的间隔线
-(use-package smart-mode-line
-  :config
-  (setq sml/no-confirm-load-theme 1
-        sml/theme 'automatic)
-  (sml/setup))
-
-;;gnuplot绘图工具
-(use-package gnuplot-mode)
-
-;; 设置agenda 显示中文 月、周、日
-;; https://emacs-china.org/t/agenda/7711/4
-(setq-default
- ;;inhibit-startup-screen t;隐藏启动显示画面
- ;; calendar-date-style 'iso
- calendar-day-abbrev-array ["周七" "周一" "周二" "周三" "周四" "周五" "周六"]
- calendar-day-name-array ["周七" "周一" "周二" "周三" "周四" "周五" "周六"]
- calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"]
- calendar-week-start-day 1 ;;设置一周从周一开始
- org-agenda-deadline-leaders (quote ("最后期限:  " "%3d 天后到期: " "%2d 天前: "))
- org-agenda-scheduled-leaders (quote ("要事:" "%2d次☞"))
- ;; ------时间戳汉化------
- system-time-locale "zh_CN.UTF-8" ;; "C":英文格式
- org-time-stamp-formats  '("<%Y-%m-%d 周%a>" . "<%Y-%m-%d 周%a %H:%M>")
- org-display-custom-times t
- org-time-stamp-custom-formats '("<%Y-%m-%d 周%a>" . "<%Y-%m-%d 周%a %H:%M>")
- org-deadline-warning-days 2 ;;最后期限到达前5天即给出警告
- )
-
-
-;;设置系统编码
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-
-;; 设置垃圾回收阈值,加速启动
-(setq gc-cons-threshold most-positive-fixnum)
-
-;; 使用xelatex，配合当前org文件最开始的配置来正常输出中文
-;; 这类笔记基本不可能是全英文，所以就安心用xelatex算了
-(setq org-latex-pdf-process '("xelatex -file-line-error -interaction nonstopmode %f"
-                              "bibtex %b"
-                              "xelatex -file-line-error -interaction nonstopmode %f"
-                              "xelatex -file-line-error -interaction nonstopmode %f"))
-
-;; 生成PDF后清理辅助文件
-;; https://answer-id.com/53623039
-(setq org-latex-logfiles-extensions
-      (quote ("lof" "lot" "tex~" "tex" "aux"
-              "idx" "log" "out" "toc" "nav"
-              "snm" "vrb" "dvi" "fdb_latexmk"
-              "blg" "brf" "fls" "entoc" "ps"
-              "spl" "bbl" "xdv")))
-
-;; 图片默认宽度
-(setq org-image-actual-width '(300))
-
-(setq org-export-with-sub-superscripts nil)
-
-;; 不要自动创建备份文件
-(setq make-backup-files nil)
-
-(setq org-latex-pdf-process '("xelatex -interaction nonstopmode %f"
-                              "xelatex -interaction nonstopmode %f"))
-;; elegantpaper.cls
-;; https://github.com/ElegantLaTeX/ElegantPaper/blob/master/elegantpaper.cls
-(with-eval-after-load 'ox-latex
-  ;; http://orgmode.org/worg/org-faq.html#using-xelatex-for-pdf-export
-  ;; latexmk runs pdflatex/xelatex (whatever is specified) multiple times
-  ;; automatically to resolve the cross-references.
-  (setq org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f %f"))
-  (add-to-list 'org-latex-classes
-               '("elegantpaper"
-                 "\\documentclass[lang=cn]{elegantpaper}
-                 [NO-DEFAULT-PACKAGES]
-                 [PACKAGES]
-                 [EXTRA]"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-  (setq org-latex-listings 'minted)
-  (add-to-list 'org-latex-packages-alist '("" "minted")))
 
 ;; End:
 ;;; custom.el ends here
