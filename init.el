@@ -174,6 +174,7 @@
              '(font . "Menlo-18"))
 
 ;;marvin-start
+(require-package 'use-package)
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
   (package-install 'use-package))

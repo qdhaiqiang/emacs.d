@@ -15,55 +15,110 @@
  ;; If there is more than one, they won't work right.
  )
 
-(require 'dir-treeview)
-(global-set-key (kbd "<f9>") 'dir-treeview)
-(load-theme 'dir-treeview-pleasant t)
+;; tree工具
+;; (use-package dir-treeview
+;;   :ensure t
+;;   :init (add-hook 'after-init-hook 'dir-treeview)
+;;   :config
+;;   (load-theme 'dir-treeview-pleasant t))
 
+;; (global-set-key (kbd "<f9>") 'dir-treeview)
 
+;;删除当前行
+(use-package crux
+  :bind ("C-c k" . crux-smart-kill-line))
+
+;;代码块或者代码行的上下移动
+(use-package drag-stuff
+  :bind (("<M-up>". drag-stuff-up)
+         ("<M-down>" . drag-stuff-down)))
+
+(use-package ivy
+  :defer 1
+  :demand
+  :hook (after-init . ivy-mode)
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t
+        ivy-initial-inputs-alist nil
+        ivy-count-format "%d/%d "
+        enable-recursive-minibuffers t
+        ivy-re-builders-alist '((t . ivy--regex-ignore-order))))
+
+(use-package counsel
+  :after (ivy)
+  :bind (("M-x" . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
+         ("C-c f" . counsel-recentf)
+         ("C-c g" . counsel-git)))
+
+(use-package swiper
+  :after ivy
+  :bind (("C-s" . swiper)
+         ("C-r" . swiper-isearch-backward))
+  :config (setq swiper-action-recenter t
+                swiper-include-line-number-in-search t))
 ;;(global-set-key (kbd "C-s") 'swiper-isearch)
 ;;(require-package 'swiper)
-(use-package swiper
+
+
+;;高亮当前行，当文本内容很多时可以很容易找到光标的位置。
+(global-hl-line-mode 1)
+
+;; 启用时间显示设置，在minibuffer上面的那个杠上
+(display-time-mode t)
+
+;;删除快捷键
+;;(define-key org-mode-map (kbd "M-c") nil)
+
+
+;; naver lose the cursor
+(use-package beacon
+  :init (add-hook 'after-init-hook 'beacon-mode))
+
+(use-package projectile
   :ensure t
-  :bind (("C-s" . swiper-isearch)
-         ("C-r" . swiper-isearch)
-         ("C-c C-r" . ivy-resume)
-         ;;("M-x" . counsel-M-x)
-         ;;("C-x C-f" . counsel-find-file)
-         )
+  :bind-keymap ("\C-c p" . projectile-command-map)
   :config
-  (progn
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t)
-    (setq ivy-display-style 'fancy)
-    (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-    ))
+  (projectile-mode t)
+  (setq projectile-completion-system 'ivy)
+  (use-package counsel-projectile
+    :ensure t))
 
 ;;自动补全配置
 (use-package company
-  :ensure t
   :config
-  (setq company-idle-delay 0)
-  (setq company-minimum-prefix-length 3)
-  (global-company-mode t)
-  )
+  (setq company-dabbrev-code-everywhere t
+        company-dabbrev-code-modes t
+        company-dabbrev-code-other-buffers 'all
+        company-dabbrev-downcase nil
+        company-dabbrev-ignore-case t
+        company-dabbrev-other-buffers 'all
+        company-require-match nil
+        company-minimum-prefix-length 2
+        company-show-numbers t
+        company-tooltip-limit 20
+        company-idle-delay 0
+        company-echo-delay 0
+        company-tooltip-offset-display 'scrollbar
+        company-begin-commands '(self-insert-command))
+  (push '(company-semantic :with company-yasnippet) company-backends)
+  :hook ((after-init . global-company-mode)))
 
 ;;漂亮的间隔线
 (use-package smart-mode-line
-  :config
-  (setq sml/no-confirm-load-theme 1
-        sml/theme 'automatic)
+  :init
+  (setq sml/no-confirm-load-theme t)
+  (setq sml/theme 'automatic)
   (sml/setup))
-
-;;gnuplot绘图工具
-(use-package gnuplot-mode)
 
 ;; 设置agenda 显示中文 月、周、日
 ;; https://emacs-china.org/t/agenda/7711/4
 (setq-default
  ;;inhibit-startup-screen t;隐藏启动显示画面
  ;; calendar-date-style 'iso
- calendar-day-abbrev-array ["周七" "周一" "周二" "周三" "周四" "周五" "周六"]
- calendar-day-name-array ["周七" "周一" "周二" "周三" "周四" "周五" "周六"]
+ calendar-day-abbrev-array ["日" "一" "二" "三" "四" "五" "六"]
+ calendar-day-name-array ["日" "一" "二" "三" "四" "五" "六"]
  calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"]
  calendar-week-start-day 1 ;;设置一周从周一开始
  org-agenda-deadline-leaders (quote ("最后期限:  " "%3d 天后到期: " "%2d 天前: "))
@@ -184,6 +239,10 @@
 
 ;;; ------------------org-mode setting beginning
 
+;; dired模式默认递归删除目录
+(setq dired-recursive-deletes 'always)
+(setq dired-recursive-copies 'always)
+
 (global-set-key (kbd "<f12>") 'org-agenda)
 
 ;; org文件生成reveal.js PPT
@@ -217,6 +276,22 @@
    (sql . t)
    (java . t)
    ))
+
+;;用[ <s ]这样的定义快速开始代码块
+(setq org-structure-template-alist
+      (quote (("s" "#+begin_src ?\n\n#+end_src" "<src lang=\"?\">\n\n</src>")
+              ("e" "#+begin_example\n?\n#+end_example" "<example>\n?\n</example>")
+              ("q" "#+begin_quote\n?\n#+end_quote" "<quote>\n?\n</quote>")
+              ("v" "#+begin_verse\n?\n#+end_verse" "<verse>\n?\n</verse>")
+              ("c" "#+begin_center\n?\n#+end_center" "<center>\n?\n</center>")
+              ("l" "#+begin_latex\n?\n#+end_latex" "<literal style=\"latex\">\n?\n</literal>")
+              ("L" "#+latex: " "<literal style=\"latex\">?</literal>")
+              ("h" "#+begin_html\n?\n#+end_html" "<literal style=\"html\">\n?\n</literal>")
+              ("H" "#+html: " "<literal style=\"html\">?</literal>")
+              ("a" "#+begin_ascii\n?\n#+end_ascii")
+              ("A" "#+ascii: ")
+              ("i" "#+index: ?" "#+index: ?")
+              ("I" "#+include %file ?" "<include file=%file markup=\"?\">"))))
 
 ;; 打开 org-indent mode
 (setq org-startup-indented t)
@@ -255,7 +330,7 @@
 
 (setq org-agenda-text-search-extra-files
       (list "~/Library/Mobile Documents/com~apple~CloudDocs/org-doc/log.org"
-            "~/org/config.org"
+            "/Users/mahaiqiang/git/redcreation/xh-live-training/hc-meeting/doc.org"
             ))
 
 ;; agenda 里面时间块彩色显示
@@ -294,7 +369,7 @@
 ;;;通过修改 org-todo-keyword-faces 这个变量可以达到这个目的。
 ;;;例如我们希望 "TODO" 以红色显示，"DOING" 以黄色显示，"DONE" 用绿色显示
 (setq org-todo-keyword-faces '(("TODO" . "red")
-                               ("DOING" . "yellow")
+                               ("DOING" . "origin")
                                ("DONE" . "forest green")
                                ("BUG" . "origin")
                                ("FIXED" . "green")
@@ -423,16 +498,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes
-   '(smart-mode-line-dark sanityinc-tomorrow-blue dir-treeview-pleasant))
+ '(custom-enabled-themes '(sanityinc-solarized-light))
  '(package-selected-packages
-   '(swiper lsp-java yasnippet org-bullets ox-reveal expand-region flycheck-clj-kondo keycast undo-tree cnfonts envrc uptimes shfmt dotenv-mode osx-location htmlize lua-mode gnuplot sudo-edit flycheck-ledger ledger-mode dash-at-point origami regex-tool info-colors flycheck-clojure cider elein cljsbuild-mode clojure-mode slime-company slime cask-mode flycheck-relint cl-libify flycheck-package highlight-quoted macrostep aggressive-indent immortal-scratch auto-compile ipretty elisp-slime-nav paredit nginx-mode company-nixos-options nixos-options nix-buffer nix-sandbox nixpkgs-fmt nix-mode company-terraform terraform-mode docker-compose-mode dockerfile-mode docker yaml-mode flycheck-rust racer rust-mode flycheck-nim nim-mode j-mode dune-format dune merlin-eldoc merlin-company merlin tuareg sqlformat projectile-rails yard-mode bundler yari robe ruby-compilation inf-ruby rspec-mode ruby-hash-syntax psci psc-ide purescript-mode flycheck-elm elm-test-runner elm-mode dhall-mode dante haskell-mode reformatter toml-mode company-anaconda anaconda-mode pip-requirements restclient httprepl haml-mode css-eldoc skewer-less sass-mode rainbow-mode tagedit org-pomodoro writeroom-mode org-cliplink grab-mac-link company-php smarty-mode php-mode add-node-modules-path skewer-mode js-comint coffee-mode xref-js2 prettier-js typescript-mode js2-mode json-mode erlang csv-mode markdown-mode textile-mode crontab-mode alert ibuffer-projectile github-review forge github-clone bug-reference-github yagist git-commit magit-todos magit git-timemachine gitconfig-mode gitignore-mode git-blamed vc-darcs browse-at-remote whitespace-cleanup-mode which-key highlight-escape-sequences whole-line-or-region move-dup page-break-lines multiple-cursors avy browse-kill-ring symbol-overlay rainbow-delimiters beacon mode-line-bell vlf list-unicode-display unfill mmm-mode windswap switch-window company-quickhelp company marginalia consult-flycheck embark-consult projectile consult embark orderless vertico flycheck-color-mode-line flycheck ibuffer-vc wgrep-ag ag wgrep anzu diff-hl diredfl disable-mouse default-text-scale ns-auto-titlebar dimmer color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized command-log-mode scratch diminish exec-path-from-shell gnu-elpa-keyring-update fullframe seq pdf-view-restore gnuplot-mode)))
-
-;; 启用时间显示设置，在minibuffer上面的那个杠上
-(display-time-mode t)
-
-;;删除快捷键
-(define-key org-mode-map (kbd "M-c") nil)
+   '(swiper use-package lsp-java yasnippet org-bullets ox-reveal expand-region flycheck-clj-kondo keycast undo-tree cnfonts envrc uptimes shfmt dotenv-mode osx-location htmlize lua-mode gnuplot sudo-edit flycheck-ledger ledger-mode dash-at-point origami regex-tool info-colors flycheck-clojure cider elein cljsbuild-mode clojure-mode slime-company slime cask-mode flycheck-relint cl-libify flycheck-package highlight-quoted macrostep aggressive-indent immortal-scratch auto-compile ipretty elisp-slime-nav paredit nginx-mode company-nixos-options nixos-options nix-buffer nix-sandbox nixpkgs-fmt nix-mode company-terraform terraform-mode docker-compose-mode dockerfile-mode docker yaml-mode flycheck-rust racer rust-mode flycheck-nim nim-mode j-mode dune-format dune merlin-eldoc merlin-company merlin tuareg sqlformat projectile-rails yard-mode bundler yari robe ruby-compilation inf-ruby rspec-mode ruby-hash-syntax psci psc-ide purescript-mode flycheck-elm elm-test-runner elm-mode dhall-mode dante haskell-mode reformatter toml-mode company-anaconda anaconda-mode pip-requirements restclient httprepl haml-mode css-eldoc skewer-less sass-mode rainbow-mode tagedit org-pomodoro writeroom-mode org-cliplink grab-mac-link company-php smarty-mode php-mode add-node-modules-path skewer-mode js-comint coffee-mode xref-js2 prettier-js typescript-mode js2-mode json-mode erlang csv-mode markdown-mode textile-mode crontab-mode alert ibuffer-projectile github-review forge github-clone bug-reference-github yagist git-commit magit-todos magit git-timemachine gitconfig-mode gitignore-mode git-blamed vc-darcs browse-at-remote whitespace-cleanup-mode which-key highlight-escape-sequences whole-line-or-region move-dup page-break-lines multiple-cursors avy browse-kill-ring symbol-overlay rainbow-delimiters beacon mode-line-bell vlf list-unicode-display unfill mmm-mode windswap switch-window company-quickhelp company marginalia consult-flycheck embark-consult projectile consult embark orderless vertico flycheck-color-mode-line flycheck ibuffer-vc wgrep-ag ag wgrep anzu diff-hl diredfl disable-mouse default-text-scale ns-auto-titlebar dimmer color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized command-log-mode scratch diminish exec-path-from-shell gnu-elpa-keyring-update fullframe seq counsel-projectile))
+ '(window-divider-mode nil))
 
 
 
