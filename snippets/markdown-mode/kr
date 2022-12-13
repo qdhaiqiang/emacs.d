@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: kr
+# key: kr
+# --
+\`\`\`klipse-reagent
+$0
+\`\`\`

@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: create-table
+# key: create
+# --
+CREATE TABLE `$1` (
+ `id` varchar(40) NOT NULL COMMENT '主键',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='$2';
+ 

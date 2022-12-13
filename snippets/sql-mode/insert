@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: insert
+# key: insert
+# --
+-- :name insert-$1! :! :n
+insert into $1 ($2) values ($3)

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: kreg
+# key: kreg
+# --
+\`\`\`klipse-reagent
+$0
+\`\`\`

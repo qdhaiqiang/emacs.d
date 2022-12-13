@@ -1,0 +1,7 @@
+# key: >sub
+# name: reg-sub
+# --
+(rf/reg-sub
+ :${1::key}
+ (fn [db]
+   (get-in db [$2] ${3:default})))

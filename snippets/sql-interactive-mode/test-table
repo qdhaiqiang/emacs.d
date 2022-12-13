@@ -1,0 +1,4 @@
+# key: >t
+# name: test-table
+# --
+create table test (id int(11) NOT NULL AUTO_INCREMENT, name varchar(20), PRIMARY KEY (\`id\`));

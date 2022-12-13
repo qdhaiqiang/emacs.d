@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: include
+# key: >inc
+# --
+(:require
+   ["moment" :as moment]
+   [reagent.core :as r]
+   [re-frame.core :as rf]
+   [com.rpl.specter :as st]
+   [goog.string :as gstring]
+   [redcreation.redant.reagent :as ant])
