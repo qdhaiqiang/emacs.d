@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: org-mysql
+# key: sql
+# --
+#+BEGIN_SRC sql :engine mysql :dbhost localhost :dbport 3306 :dbuser root :dbpassword root :database $1
+    $2
+#+END_SRC

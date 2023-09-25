@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: org-caption
+# key: org-
+# --
+#+CAPTION: This is the caption for the next table (or link)
+#+NAME:   tab:basic-data

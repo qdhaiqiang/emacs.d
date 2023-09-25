@@ -1,0 +1,5 @@
+# key: insertk
+# name: insert-keygen
+# --
+-- :name insert-$1-key-gen! :i! :raw
+insert into $1 ($2) values ($3)

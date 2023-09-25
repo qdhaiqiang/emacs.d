@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: lx
+# key: lx
+# --
+<code>
+\$$0\$()
+</code>
