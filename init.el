@@ -68,7 +68,7 @@
 (require 'init-hippie-expand)
 (require 'init-corfu)
 (require 'init-windows)
-(require 'init-sessions)
+;;(require 'init-sessions)
 (require 'init-mmm)
 
 (require 'init-editing-utils)
@@ -156,6 +156,9 @@
   (require 'init-treesitter))
 
 
+;;emoji
+(set-fontset-font "fontset-default" 'emoji (font-spec :family "Apple Color Emoji") nil 'prepend)
+
 
 ;; Allow access from emacsclient
 (add-hook 'after-init-hook
@@ -181,3 +184,4 @@
 ;; no-byte-compile: t
 ;; End:
 ;;; init.el ends here
+(put 'scroll-left 'disabled nil)

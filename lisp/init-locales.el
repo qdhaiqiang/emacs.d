@@ -38,7 +38,7 @@
   (setq use-package-verbose t))
 
 ;; 设置光标为竖条
-(setq-default cursor-type 'bar) 
+(setq-default cursor-type 'bar)
 
 ;;高亮当前行，当文本内容很多时可以很容易找到光标的位置。
 (global-hl-line-mode 1)
@@ -50,9 +50,21 @@
 ;;(define-key org-mode-map (kbd "M-c") nil)
 
 ;;菜单我需要显示，工具栏和滚动条不用显示
-(menu-bar-mode 1)
+(menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+
+;;tree-sitter
+(setq major-mode-remap-alist
+      '((yaml-mode . yaml-ts-mode)
+        (sh-mode . bash-ts-mode)
+        (js-mode . js-ts-mode)
+        (css-mode . css-ts-mode)
+        (c-mode . c-ts-mode)
+        (c++-mode . c++-ts-mode)
+        (c-or-c++-mode . c-or-c++-ts-mode)
+        (python-mode . python-ts-mode)))
+
 
 ;;漂亮的间隔线
 (use-package smart-mode-line
@@ -252,7 +264,11 @@
 
 
 ;;; ------------------org-mode setting beginning
-
+;;
+(require 'org-download)
+;; Drag-and-drop to `dired`
+(add-hook 'dired-mode-hook 'org-download-enable)
+(setq-default org-download-image-dir "~/Downloads/foo")
 ;; dired模式默认递归删除目录
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
