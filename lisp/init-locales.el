@@ -24,6 +24,8 @@
 
 
 ;;marvin-start
+
+
 (require-package 'use-package)
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
@@ -45,6 +47,13 @@
 
 ;; 启用时间显示设置，在minibuffer上面的那个杠上
 (display-time-mode t)
+
+;;全局开启undotree
+(use-package undo-tree
+  :ensure t
+  :init (global-undo-tree-mode)
+  :custom
+  (undo-tree-auto-save-history nil))
 
 ;;删除快捷键
 ;;(define-key org-mode-map (kbd "M-c") nil)
@@ -69,7 +78,7 @@
 ;;漂亮的间隔线
 (use-package smart-mode-line
   :init
-  (setq sml/no-confirm-load-theme t)
+  ;; (setq sml/no-confirm-load-theme t)
   (setq sml/theme 'automatic)
   (sml/setup))
 
@@ -118,7 +127,7 @@
   (set-frame-parameter nil 'fullscreen
                        (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
 ;; 默认启动进入全屏
-;;(fullscreen)
+(fullscreen)
 
 ;; 中文对齐
 (require-package 'cnfonts)
@@ -161,11 +170,11 @@
         ]
        ))
   (mapcar (lambda(x) (define-key key-translation-map
-                       (kbd (elt x 0)) (kbd (elt x 1)))) $replacePairs))
+                                 (kbd (elt x 0)) (kbd (elt x 1)))) $replacePairs))
 
 
 ;; 80个字符处放置竖线,对应函数:global-display-fill-column-indicator-mode
-(setq-default fill-column 120)
+(setq-default fill-column 100)
 
 ;; 区域选择,按 <C-c => 扩大选中区域，按 <C-c -> 缩小选中区域
 (require-package 'expand-region)
@@ -175,7 +184,6 @@
 ;;执行命令 `toggle-company-english-helper’ , 就可以在Emacs中飞速的编写英文文档了
 ;;安装参考：https://manateelazycat.github.io/emacs/2018/08/08/company-english-helper.html
 ;;(require 'compan-yenglish-helper)
-
 
 
 ;;(require 'auto-save)            ;; 加载自动保存模块
@@ -192,7 +200,12 @@
 (setq markdown-command "/usr/local/bin/pandoc")
 
 ;;静态代码检查：https://github.com/borkdude/flycheck-clj-kondo
-(require 'flycheck-clj-kondo)
+(use-package flycheck
+  :ensure t
+  :config
+  (setq truncate-lines nil) ; 如果单行信息很长会自动换行
+  :hook
+  (prog-mode . flycheck-mode))
 
 (setq org-startup-indented t)
 
@@ -230,6 +243,31 @@
   :config (setq swiper-action-recenter t
                 swiper-include-line-number-in-search t))
 
+;;treemacs
+(use-package treemacs
+  :ensure t
+  :defer t
+  :config
+  (treemacs-tag-follow-mode)
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t B"   . treemacs-bookmark)
+        ;; ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag))
+  (:map treemacs-mode-map
+        ("/" . treemacs-advanced-helpful-hydra)))
+
+(use-package treemacs-projectile
+  :ensure t
+  :after (treemacs projectile))
+
+(use-package lsp-treemacs
+  :ensure t
+  :after (treemacs lsp))
+;; treeemacs end
 
 ;; 启动时打开指定文件
 (find-file "~/git/mine/org-doc/log.org")
@@ -260,18 +298,25 @@
 (add-hook 'before-save-hook
           'delete-trailing-whitespace)
 
+;;如何在 macOS 上粘贴图片到 Emacs
+(use-package org-mac-image-paste
+  :config
+  (org-mac-image-paste-mode 1)
+  )
+
 
 
 
 ;;; ------------------org-mode setting beginning
-;;
 (require 'org-download)
+
 ;; Drag-and-drop to `dired`
 (add-hook 'dired-mode-hook 'org-download-enable)
-(setq-default org-download-image-dir "~/Downloads/foo")
 ;; dired模式默认递归删除目录
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
+
+(setq-default org-download-image-dir "~/Downloads/foo")
 
 (global-set-key (kbd "<f12>") 'org-agenda)
 
@@ -279,12 +324,29 @@
 (require-package 'ox-reveal)
 (load-library "ox-reveal")
 
-;; 使用org-bullets
-(require-package 'org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+(setq org-hide-leading-stars t) ;;隐藏标题栏里的一堆星号
 
-;;开启自动折行,防止一行文字的长度超出屏幕范围时，行会继续往右延伸而导致部分内容不可见(因在屏幕范围外而无法看见)
+
+;; 使用org-bullets
+(require 'org-bullets)
+;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+;; 设置 bullet list,可以用UTF-8 Miscellaneous Symbols自己定义
+(setq org-bullets-bullet-list '("◉" "☰" "☳" "☯" "☀" "★" "☷" "☭" "⚙" "✤" "➤"))
+(setq org-hide-emphasis-markers t)   ;;直接显示语法样式
+(setq org-ellipsis " ▼ ")   ;; 折叠时不在显示[...],换个你喜欢的符号
+
+;;; config.el
+(use-package org-modern
+  :after org
+  :config
+  (add-hook 'org-mode-hook #'org-modern-mode))
+(with-eval-after-load 'org (global-org-modern-mode))
+
+;;开启自动折行,防止一行文字的长度超出屏幕范围时，行会继续往右延伸而导致部分内容不可见
 (setq truncate-lines nil)
+
+;;更改行间距
+(setq line-spacing 0.25)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -329,10 +391,6 @@
 ;; 设置默认不要展开，全部折叠
 (setq org-startup-folded t)
 
-;; 设置 bullet list,可以用UTF-8 Miscellaneous Symbols自己定义
-(setq org-bullets-bullet-list '("☀" "☳" "☯" "☰" "★" "☷" "☭" "⚙" "✤"))
-;;(setq org-ellipsis "⤵")
-
 ;;;设置jar包路径
 (setq org-plantuml-jar-path
       (expand-file-name "~/.emacs.d/jar/plantuml-1.2022.7.jar"))
@@ -352,15 +410,16 @@
 ;; Make babel results blocks lowercase
 ;;(setq org-babel-results-keyword "results")
 
+
 ;;;agenda 模式配置
 (setq org-agenda-start-on-weekday 1) ;我喜欢一周以周一做开始
-(setq org-agenda-files (list "~/Library/Mobile Documents/com~apple~CloudDocs/org-doc/log.org"
-                             "~/Library/Mobile Documents/com~apple~CloudDocs/org-doc/learn.org"
+(setq org-agenda-files (list "/Users/mahaiqiang/git/mine/org-doc/log.org"
+                             "/Users/mahaiqiang/git/mine/org-doc/learn.org"
                              ))
 
 (setq org-agenda-text-search-extra-files
-      (list "~/Library/Mobile Documents/com~apple~CloudDocs/org-doc/log.org"
-            "/Users/mahaiqiang/git/redcreation/xh-live-training/hc-meeting/doc.org"
+      (list "/Users/mahaiqiang/git/mine/org-doc/log.org"
+            "/Users/mahaiqiang/git/mine/org-doc/learn.org"
             ))
 
 ;; agenda 里面时间块彩色显示
@@ -406,8 +465,8 @@
                                ("CANCELLED" . "red")
                                ("BLOCK" . (:foreground "blue" :weight bold))))
 
-;;;;插动图片到org 文件时， 自动将文件放到org下的imgs/下，并插入[[file:…imgs/image.jpg]]
-(defun vmacs-org-insert-image (event)
+;;;;插动图片到org 文件时， 自动将文件放到org下的imgs/下，并插入[[file:…imgs/imgs.jpg]]
+(defun emacs-org-insert-image (event)
   (interactive "e")
   (x-focus-frame nil)
   (let* ((payload (car (last event)))
@@ -455,7 +514,10 @@
     (set-face-underline-p 'org-link t))
   (call-interactively 'iimage-mode))
 
-(setq org-image-actual-width '(800))
+;;org 文件中设置图片显示尺寸
+(setq org-image-actual-width '(300))
+;;让图片显示的大小固定为屏幕宽度的三分之一
+;;(setq org-image-actual-width (/ (display-pixel-width) 3))
 
 (setq org-table-export-default-format "orgtbl-to-csv")
 
@@ -522,6 +584,11 @@
 
 
 
+
+
+
+
+;; 使用svg-tag-mode美化
 
 
 
