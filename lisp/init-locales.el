@@ -74,6 +74,14 @@
         (c-or-c++-mode . c-or-c++-ts-mode)
         (python-mode . python-ts-mode)))
 
+;;放大缩小的快捷键
+(global-set-key (kbd "M-=") 'cnfonts-increase-fontsize)
+(global-set-key (kbd "M--") 'cnfonts-decrease-fontsize)
+;; 禁用 M-滚轮 方法/缩小页面
+(global-unset-key [C-wheel-up])
+(global-unset-key [C-wheel-down])
+(global-unset-key [C-M-wheel-up])
+(global-unset-key [C-M-wheel-down])
 
 ;;漂亮的间隔线
 (use-package smart-mode-line
@@ -105,11 +113,13 @@
  )
 
 
-;;设置系统编码
+;;所有地方都使用utf8编码，并显式地设置它，而不依赖于Emacs默认值
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
+
 
 ;; 设置垃圾回收阈值,加速启动
 (setq gc-cons-threshold most-positive-fixnum)
@@ -298,13 +308,6 @@
 (add-hook 'before-save-hook
           'delete-trailing-whitespace)
 
-;;如何在 macOS 上粘贴图片到 Emacs
-(use-package org-mac-image-paste
-  :config
-  (org-mac-image-paste-mode 1)
-  )
-
-
 
 
 ;;; ------------------org-mode setting beginning
@@ -335,12 +338,33 @@
 (setq org-hide-emphasis-markers t)   ;;直接显示语法样式
 (setq org-ellipsis " ▼ ")   ;; 折叠时不在显示[...],换个你喜欢的符号
 
-;;; config.el
+
 (use-package org-modern
   :after org
+  :custom
+  ;; Org modern settings
+  ;;(org-modern-star nil)
+  ;;(org-modern-priority nil)
+  ;;(org-modern-list nil)
+  ;;(org-modern-checkbox nil)
+  ;;(org-modern-todo nil)
+  ;;(org-modern-keyword nil)
+
+  ;; Editor settings
+  (org-auto-align-tags nil)
+  (org-tags-column 0)
+  (org-catch-invisible-edits 'show-and-error)
+  (org-special-ctrl-a/e t)
   :config
-  (add-hook 'org-mode-hook #'org-modern-mode))
-(with-eval-after-load 'org (global-org-modern-mode))
+  (add-hook 'org-mode-hook #'org-modern-mode)
+  (global-org-modern-mode 1))
+
+(use-package valign
+  :after org
+  )
+(add-hook 'org-mode-hook #'valign-mode)   ;; 解决org-mode 表格对齐问题
+
+
 
 ;;开启自动折行,防止一行文字的长度超出屏幕范围时，行会继续往右延伸而导致部分内容不可见
 (setq truncate-lines nil)
@@ -401,13 +425,14 @@
 (setq org-confirm-babel-evaluate nil)
 
 ;;;预览图像
+
+(add-hook 'org-babel-after-execute-hook 'bh/display-inline-images 'append)
 (defun bh/display-inline-images ()
   (condition-case nil
       (org-display-inline-images)
     (error nil)))
-(add-hook 'org-babel-after-execute-hook 'bh/display-inline-images 'append)
 
-;; Make babel results blocks lowercase
+;; 让代码生成的results关键字小写-
 ;;(setq org-babel-results-keyword "results")
 
 
@@ -515,9 +540,9 @@
   (call-interactively 'iimage-mode))
 
 ;;org 文件中设置图片显示尺寸
-(setq org-image-actual-width '(300))
+;;(setq org-image-actual-width '(400))
 ;;让图片显示的大小固定为屏幕宽度的三分之一
-;;(setq org-image-actual-width (/ (display-pixel-width) 3))
+;;(setq org-image-actual-width (/ (display-pixel-width) 4))
 
 (setq org-table-export-default-format "orgtbl-to-csv")
 
@@ -579,25 +604,6 @@
 
 
 ;;marvin-end
-
-
-
-
-
-
-
-
-
-;; 使用svg-tag-mode美化
-
-
-
-
-
-
-
-
-
 
 (provide 'init-locales)
 ;;; init-locales.el ends here
