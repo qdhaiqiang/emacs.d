@@ -217,6 +217,20 @@
   :hook
   (prog-mode . flycheck-mode))
 
+;; First install the package:
+(use-package flycheck-clj-kondo
+  :ensure t)
+
+;; then install the checker as soon as `clojure-mode' is loaded
+(use-package clojure-mode
+  :ensure t
+  :config
+  (require 'flycheck-clj-kondo))
+
+(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+
+
 (setq org-startup-indented t)
 
 ;;使用 Emacs 发送电子邮件和检查日历
@@ -334,11 +348,12 @@
 (require 'org-bullets)
 ;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 ;; 设置 bullet list,可以用UTF-8 Miscellaneous Symbols自己定义
-(setq org-bullets-bullet-list '("◉" "☰" "☳" "☯" "☀" "★" "☷" "☭" "⚙" "✤" "➤"))
+(setq org-bullets-bullet-list '("✤"  "☷" "◉" "☰" "☳" "☯" "☀" "★" "☭" "⚙"  "➤"))
 (setq org-hide-emphasis-markers t)   ;;直接显示语法样式
 (setq org-ellipsis " ▼ ")   ;; 折叠时不在显示[...],换个你喜欢的符号
 
 
+;;
 (use-package org-modern
   :after org
   :custom
@@ -356,8 +371,9 @@
   (org-catch-invisible-edits 'show-and-error)
   (org-special-ctrl-a/e t)
   :config
-  (add-hook 'org-mode-hook #'org-modern-mode)
-  (global-org-modern-mode 1))
+  ;;(add-hook 'org-mode-hook #'org-modern-mode)
+  ;;(global-org-modern-mode 1)
+  )
 
 (use-package valign
   :after org
