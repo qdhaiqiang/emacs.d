@@ -2,18 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(defun sanityinc/locale-var-encoding (v)
-  "Return the encoding portion of the locale string V, or nil if missing."
-  (when v
-    (save-match-data
-      (let ((case-fold-search t))
-        (when (string-match "\\.\\([^.]*\\)\\'" v)
-          (intern (downcase (match-string 1 v))))))))
-
-(dolist (varname '("LC_ALL" "LANG" "LC_CTYPE"))
-  (let ((encoding (sanityinc/locale-var-encoding (getenv varname))))
-    (unless (memq encoding '(nil utf8 utf-8))
-      (message "Warning: non-UTF8 encoding in environment variable %s may cause interop problems with this Emacs configuration." varname))))
 
 (when (fboundp 'set-charset-priority)
   (set-charset-priority 'unicode))
@@ -227,9 +215,6 @@
   :config
   (require 'flycheck-clj-kondo))
 
-(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
-  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
-
 
 (setq org-startup-indented t)
 
@@ -239,6 +224,7 @@
 ;; Or start grip when opening a markdown/org buffer
 ;;(add-hook 'markdown-mode-hook #'grip-mode)
 
+(set-fontset-font "fontset-default" 'emoji (font-spec :family "Apple Color Emoji") nil 'prepend)
 
 ;;ivy三剑客
 (use-package ivy
@@ -346,7 +332,7 @@
 
 ;; 使用org-bullets
 (require 'org-bullets)
-;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 ;; 设置 bullet list,可以用UTF-8 Miscellaneous Symbols自己定义
 (setq org-bullets-bullet-list '("✤"  "☷" "◉" "☰" "☳" "☯" "☀" "★" "☭" "⚙"  "➤"))
 (setq org-hide-emphasis-markers t)   ;;直接显示语法样式
@@ -366,10 +352,10 @@
   ;;(org-modern-keyword nil)
 
   ;; Editor settings
-  (org-auto-align-tags nil)
-  (org-tags-column 0)
-  (org-catch-invisible-edits 'show-and-error)
-  (org-special-ctrl-a/e t)
+  ;;(org-auto-align-tags nil)
+  ;;(org-tags-column 0)
+  ;;(org-catch-invisible-edits 'show-and-error)
+  ;;(org-special-ctrl-a/e t)
   :config
   ;;(add-hook 'org-mode-hook #'org-modern-mode)
   ;;(global-org-modern-mode 1)
