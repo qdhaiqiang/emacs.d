@@ -71,6 +71,13 @@
 (global-unset-key [C-M-wheel-up])
 (global-unset-key [C-M-wheel-down])
 
+;;在当前目录打开iterm
+(define-key global-map (kbd "C-0") 'iterm-here)
+
+(defun iterm-here ()
+  (interactive)
+  (dired-smart-shell-command "open -a iTerm $PWD" nil nil))
+
 ;;漂亮的间隔线
 (use-package smart-mode-line
   :init
@@ -308,7 +315,6 @@
 (add-hook 'before-save-hook
           'delete-trailing-whitespace)
 
-
 
 ;;; ------------------org-mode setting beginning
 (require 'org-download)
@@ -354,7 +360,7 @@
   ;; Editor settings
   ;;(org-auto-align-tags nil)
   ;;(org-tags-column 0)
-  ;;(org-catch-invisible-edits 'show-and-error)
+  (org-catch-invisible-edits 'show-and-error)
   ;;(org-special-ctrl-a/e t)
   :config
   ;;(add-hook 'org-mode-hook #'org-modern-mode)
