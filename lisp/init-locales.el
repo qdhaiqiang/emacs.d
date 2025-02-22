@@ -12,7 +12,8 @@
 
 
 ;;marvin-start
-
+;;允许下载远程文件
+(setq org-allow-http-server-prompt t)
 
 (require-package 'use-package)
 (when (not (package-installed-p 'use-package))
@@ -181,6 +182,9 @@
 ;; 80个字符处放置竖线,对应函数:global-display-fill-column-indicator-mode
 (setq-default fill-column 100)
 
+;;自动换行,在28之后用:(setq word-wrap-by-category )
+(add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+
 ;; 区域选择,按 <C-c => 扩大选中区域，按 <C-c -> 缩小选中区域
 (require-package 'expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
@@ -223,13 +227,16 @@
   (require 'flycheck-clj-kondo))
 
 
-(setq org-startup-indented t)
+;;(setq org-startup-indented t)
 
 ;;使用 Emacs 发送电子邮件和检查日历
 ;;https://linux.cn/article-11932-1-rel.html
 
 ;; Or start grip when opening a markdown/org buffer
-;;(add-hook 'markdown-mode-hook #'grip-mode)
+(use-package grip-mode
+  :ensure t
+  :config (setq grip-use-grip t))
+
 
 (set-fontset-font "fontset-default" 'emoji (font-spec :family "Apple Color Emoji") nil 'prepend)
 
@@ -294,6 +301,7 @@
 ;;java支持：https://segmentfault.com/a/1190000040158765
 (require-package 'lsp-java)
 (require 'ob-sql)
+(use-package ob-rust)
 
 ;;删除当前行
 (use-package crux
@@ -317,17 +325,18 @@
 
 
 ;;; ------------------org-mode setting beginning
-(require 'org-download)
+(use-package org-download)
 
 ;; Drag-and-drop to `dired`
 (add-hook 'dired-mode-hook 'org-download-enable)
+
+(setq-default org-download-image-dir "~/Downloads/")
+
+(global-set-key (kbd "<f12>") 'org-agenda)
+
 ;; dired模式默认递归删除目录
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
-
-(setq-default org-download-image-dir "~/Downloads/foo")
-
-(global-set-key (kbd "<f12>") 'org-agenda)
 
 ;; org文件生成reveal.js PPT
 (require-package 'ox-reveal)
@@ -337,42 +346,13 @@
 
 
 ;; 使用org-bullets
-(require 'org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-;; 设置 bullet list,可以用UTF-8 Miscellaneous Symbols自己定义
-(setq org-bullets-bullet-list '("✤"  "☷" "◉" "☰" "☳" "☯" "☀" "★" "☭" "⚙"  "➤"))
-(setq org-hide-emphasis-markers t)   ;;直接显示语法样式
-(setq org-ellipsis " ▼ ")   ;; 折叠时不在显示[...],换个你喜欢的符号
-
-
-;;
-(use-package org-modern
-  :after org
-  :custom
-  ;; Org modern settings
-  ;;(org-modern-star nil)
-  ;;(org-modern-priority nil)
-  ;;(org-modern-list nil)
-  ;;(org-modern-checkbox nil)
-  ;;(org-modern-todo nil)
-  ;;(org-modern-keyword nil)
-
-  ;; Editor settings
-  ;;(org-auto-align-tags nil)
-  ;;(org-tags-column 0)
-  (org-catch-invisible-edits 'show-and-error)
-  ;;(org-special-ctrl-a/e t)
+(use-package org-bullets
   :config
-  ;;(add-hook 'org-mode-hook #'org-modern-mode)
-  ;;(global-org-modern-mode 1)
-  )
-
-(use-package valign
-  :after org
-  )
-(add-hook 'org-mode-hook #'valign-mode)   ;; 解决org-mode 表格对齐问题
-
-
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+;; 设置 bullet list,可以用UTF-8 Miscellaneous Symbols自己定义
+(setq org-bullets-bullet-list '("☯"  "☷" "◉" "☰" "✤" "☳" "➤" "☀" "★" "⚙" "☭"))
+(setq org-hide-emphasis-markers t)   ;;直接显示语法样式
+(setq org-ellipsis " ▼" )   ;; 折叠时不在显示[...],换个你喜欢的符号
 
 ;;开启自动折行,防止一行文字的长度超出屏幕范围时，行会继续往右延伸而导致部分内容不可见
 (setq truncate-lines nil)
@@ -391,7 +371,7 @@
    (python . t)
    (haskell . t)
    (dot . t)
-   ;;(latex . t)
+   (latex . t)
    (js . t)
    (ditaa . t)
    (plantuml . t)
@@ -400,6 +380,10 @@
    (sql . t)
    (java . t)
    ))
+
+;;org导出pdf或者html时下划线不用转义
+(setq org-export-with-sub-superscripts nil)
+
 
 ;;用[ <s ]这样的定义快速开始代码块
 (setq org-structure-template-alist
@@ -526,26 +510,6 @@
 
 ;; -- Display images in org mode
 ;; enable image mode first
-(iimage-mode)
-;; add the org file link format to the iimage mode regex
-(add-to-list 'iimage-mode-image-regex-alist
-             (cons (concat "\\[\\[file:\\(~?" iimage-mode-image-filename-regex "\\)\\]")  1))
-;;  add a hook so we can display images on load
-(add-hook 'org-mode-hook '(lambda () (org-turn-on-iimage-in-org)))
-;; function to setup images for display on load
-(defun org-turn-on-iimage-in-org ()
-  "display images in your org file"
-  (interactive)
-  (turn-on-iimage-mode)
-  (set-face-underline-p 'org-link nil))
-;; function to toggle images in a org bugger
-(defun org-toggle-iimage-in-org ()
-  "display images in your org file"
-  (interactive)
-  (if (face-underline-p 'org-link)
-      (set-face-underline-p 'org-link nil)
-    (set-face-underline-p 'org-link t))
-  (call-interactively 'iimage-mode))
 
 ;;org 文件中设置图片显示尺寸
 ;;(setq org-image-actual-width '(400))
@@ -604,11 +568,200 @@
               "spl" "bbl" "xdv")))
 
 
-;;自动换行,在28之后用:(setq word-wrap-by-category )
-(add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
-
-
 ;;;; org-mode setting end
+
+(use-package gptel)
+
+;; OPTIONAL configuration
+
+
+;; company-mode：代码补全框架
+(use-package company
+  :ensure
+  :custom
+  (company-idle-delay 0.5) ;; 弹层延迟显示时长
+  ;; (company-begin-commands nil) ;; 取消注释可以禁用弹层
+  :bind
+  (:map compnay-active-map
+        ("C-n". company-select-next)
+        ("C-p". company-select-previous)
+        ("M-<". company-select-first)
+        ("M->". company-select-last)))
+
+;; Rust
+(use-package rustic
+  :ensure
+  :bind (:map rustic-mod-map
+              ("M-j" . lsp-ui-imenu)
+              ("M-?" . lsp-find-references)
+              ("C-c C-c l" . flycheck-list-errors)
+              ("C-c C-c a" . lsp-execute-code-action)
+              ("C-c C-c r" . lsp-rename)
+              ("C-c C-c q" . lsp-wordspace-restart)
+              ("C-c C-c Q" . lsp-workspace-shutdown)
+              ("C-c C-c s" . lsp-rust-analyzer-status))
+  :config
+  ;; 减少闪动可以取消这里的注释
+  ;; (setq lsp-eldoc-hook nil)
+  ;; (setq lsp-enable-symbol-highlighting nil)
+  ;; (setq lsp-signature-auto-activate nil)
+  ;; 注释下面这行可以禁用保存时 rustfmt 格式化
+  (setq rustic-format-on-save t)
+  (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
+(defun rk/rustic-mode-hook ()
+  ;; 所以运行 C-c C-c C-r 无需确认就可以工作，但不要尝试保存不是文件访问的 rust 缓存。
+  ;; 一旦 https://github.com/brotzeit/rustic/issues/253 问题处理了
+  ;; 就不需要这个配置了
+  (when buffer-file-name
+    (setq-local buffer-save-without-query t)))
+
+;; cargo.el：Cargo 工具集成
+(use-package cargo
+  :ensure t
+  :hook
+  (rust-mode . cargo-minor-mode)        ; 在 rust-mode 中启用 cargo
+  :config
+  (setq cargo-process--command-clippy "clippy")) ; 使用 clippy 进行检查
+
+(use-package lsp-mode
+  :ensure
+  :commands lsp
+  :custom
+  ;; 保存时使用什么进行检查，默认是 "check"，我更推荐 "clippy"
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-eldoc-render-all t)
+  (lsp-idle-delay 0.6)
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+  :config
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+(use-package lsp-ui
+  :ensure
+  :commands lsp-ui-mode
+  :custom
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-doc-enable nil))
+
+
+
+(setenv "GPTEL_TOGETHER_KEY" "1d5ed6159c537302ceb9ef056d2b4daafd42c557bd954c2b4248e17a4c7a8f68")
+(setenv "GPTEL_GEMINI_KEY" "AIzaSyDncDcmn5jLRzWD0qGfX51RWX3y5qM3Uek")
+(setenv "GPTEL_QWEN_KEY" "sk-766f6f492b264f369bf312de82f5afd7")
+(setenv "GPTEL_DEEPSEEK_KEY" "sk-082b867923074ed2b0f420a7ec6af2c4")
+
+(gptel-make-gemini "Gemini" :key (lambda () (getenv "GPTEL_GEMINI_KEY")) :stream t)
+
+(gptel-make-openai "Groq"
+  :host "api.groq.com"
+  :endpoint "/openai/v1/chat/completions"
+  :stream t
+  :key (lambda () (getenv "GPTEL_GROQ_KEY"))
+  :models '(llama-3.1-70b-versatile
+            llama-3.1-8b-instant
+            llama3-70b-8192
+            llama3-8b-8192
+            mixtral-8x7b-32768
+            gemma-7b-it))
+
+(gptel-make-openai "Qwen"
+  :host "dashscope.aliyuncs.com"
+  :endpoint "/compatible-mode/v1/chat/completions"
+  :stream t
+  :key (lambda () (getenv "GPTEL_QWEN_KEY"))
+  :models '(qwen-max qwen-plus deepseek-v3 deepseek-r1 qwen-turbo deepseek-r1-distill-llama-70b))
+
+(gptel-make-openai "mistral"
+  :host "api.mistral.ai"
+  :endpoint "/v1/chat/completions"
+  :stream t
+  :key (lambda () (getenv "GPTEL_MISTRAL_KEY"))
+  :models '(mistral-large-latest))
+
+(gptel-make-openai "Together"
+  :host "api.together.xyz"
+  :endpoint "/v1/chat/completions"
+  :stream t
+  :key (lambda () (getenv "GPTEL_TOGETHER_KEY"))
+  :models '(deepseek-ai/DeepSeek-V3))
+
+(gptel-make-openai "siliconflow"
+  :host "api.siliconflow.cn"
+  :endpoint "/v1/chat/completions"
+  :stream t
+  :key (lambda () (getenv "GPTEL_SILICONFLOW_KEY"))
+  :models '(deepseek-ai/DeepSeek-V3 deepseek-ai/DeepSeek-R1))
+
+(setq gptel-model 'deepseek-chat
+      gptel-backend
+      (gptel-make-openai "DeepSeek"
+        :host "api.deepseek.com"
+        :endpoint "/chat/completions"
+        :stream t
+        :key (lambda () (getenv "GPTEL_DEEPSEEK_KEY"))
+        :models '(deepseek-chat deepseek-coder)))
+
+;;扩展
+
+(defun my/gptel-mode-auto ()
+  "确保此文件打开时启用 `gptel-mode'. "
+  (save-excursion
+    (let ((enable-local-variables t))   ; 确保我们可以修改局部变量
+      (if (and (save-excursion
+                 (goto-char (point-min))
+                 (looking-at ".*-\\*-"))) ; 如果存在 -*- 行
+          ;; 首先删除任何现有的 eval, 然后添加新的
+          (modify-file-local-variable-prop-line
+           'eval nil 'delete))
+      ;; 始终添加我们的 eval
+      (add-file-local-variable-prop-line
+       'eval '(and (fboundp 'gptel-mode) (gptel-mode 1))))))
+
+(add-hook 'gptel-save-state-hook #'my/gptel-mode-auto)
+
+(defun gptel-send-with-options (&optional arg)
+  "发送查询. 带前缀 ARG 时打开 gptel 菜单. "
+  (interactive "P")
+  (if arg
+      (call-interactively 'gptel-menu)
+    (gptel--suffix-send (transient-args 'gptel-menu))))
+
+
+
+
+(defun get-staged-diff ()
+  "Get the diff of staged files in the current Git repository."
+  (string-trim
+   (shell-command-to-string "git diff --cached")))
+
+(defun gptel-commit-message ()
+  "Insert a generated commit message at point using GPT."
+  (interactive)
+  (let ((diff (get-staged-diff)))
+    (gptel-request
+        (concat "请生成commit message:" diff)
+      :stream nil)))
+
+(defun gptel-commit-message ()
+  "Insert a generated commit message at point using GPT."
+  (interactive)
+  (let ((diff (get-staged-diff)))
+    (message "正在生成提交信息...")
+    (gptel-request
+        (concat "请直接生成中文的commit message, 要求如下
+    1. 使用中文
+    2. 使用英文半角标点, 比如`:\",`等
+    3. 提交信息简洁明了
+    4. 提交标题必须以下前缀之一开头：
+       - [feat] 用于新功能
+       - [bug] 用于修复bug
+       - [ref] 用于代码重构
+       - [doc] 用于文档更新
+       - [wip] 用于进行中的工作
+     5. 有列表详细描述改动的具体内容
+    " diff)
+      :stream t
+      )))
 
 
 ;;marvin-end
