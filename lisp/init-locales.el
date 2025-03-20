@@ -645,19 +645,33 @@
 
 
 
+(defvar gptel-fsm-info nil)
+
 (setenv "GPTEL_TOGETHER_KEY" "1d5ed6159c537302ceb9ef056d2b4daafd42c557bd954c2b4248e17a4c7a8f68")
-(setenv "GPTEL_GEMINI_KEY" "AIzaSyDncDcmn5jLRzWD0qGfX51RWX3y5qM3Uek")
+;;(setenv "GPTEL_GEMINI_KEY" "AIzaSyDncDcmn5jLRzWD0qGfX51RWX3y5qM3Uek")
 (setenv "GPTEL_QWEN_KEY" "sk-766f6f492b264f369bf312de82f5afd7")
 (setenv "GPTEL_DEEPSEEK_KEY" "sk-082b867923074ed2b0f420a7ec6af2c4")
+(setenv "GPTEL_GROK_KEY" "xai-FdCrYFK0QHuQ3pDRCyXNiL9HAalKTIVv5RUfGa87uB2aHEyTj5LaHLVYc54h5zbKL6Bz6PX8I9A3JZC8")
+
+;;kevin
+(setenv "GPTEL_GEMINI_KEY" "AIzaSyDMLtSi8-PrQheEkpRCWT0PyzPP-wPB36A")
+;;(setenv "GPTEL_GROK_KEY" "xai-w0okaSYZ8FunldIaJHlEVulfbsbGzmkgl8yEL7eYj7o8ZHG3HY8uSLCWJrx7L18412KfW8uVzwZgTQaZ")
+;;(setenv "GPTEL_QWEN_KEY" "sk-6fd081564985497f886dbbf7d35feba8")
+;;(setenv "GPTEL_MISTRAL_KEY"  "epImQBgC4w9sk4M1H8eIU7jpuIpMoVXE")
+;;(setenv "GPTEL_TOGETHER_KEY" "6a0345b474dc2a8d28eb772b825def086afffd1caeefc0860266bb275a303514")
+;;(setenv "GPTEL_SILICONFLOW_KEY" "sk-aiuuvkzgiyjfreoirhfyjiweqfsaacwsqgqpfyyubxooyfrs")
+;;(setenv "GPTEL_DEEPSEEK_KEY" "sk-c925fe142f944751b1d2bffe629bd696")
+
 
 (gptel-make-gemini "Gemini" :key (lambda () (getenv "GPTEL_GEMINI_KEY")) :stream t)
 
-(gptel-make-openai "Groq"
+(gptel-make-openai "Grok"
   :host "api.groq.com"
   :endpoint "/openai/v1/chat/completions"
   :stream t
   :key (lambda () (getenv "GPTEL_GROQ_KEY"))
   :models '(llama-3.1-70b-versatile
+            grok-2-latest
             llama-3.1-8b-instant
             llama3-70b-8192
             llama3-8b-8192
@@ -691,6 +705,12 @@
   :stream t
   :key (lambda () (getenv "GPTEL_SILICONFLOW_KEY"))
   :models '(deepseek-ai/DeepSeek-V3 deepseek-ai/DeepSeek-R1))
+
+(gptel-make-openai "DeepSeek"
+  :host "api.deepseek.com"
+  :key  (lambda () (getenv "GPTEL_DEEPSEEK_KEY"))
+  :models '(deepseek-ai/DeepSeek-V3)
+  :stream t)
 
 (setq gptel-model 'deepseek-chat
       gptel-backend
@@ -763,6 +783,42 @@
       :stream t
       )))
 
+
+(defun my/gptel-git-review ()
+  "Review staged git modifications using gptel-request."
+  (interactive)
+  (let* ((staged-files (split-string (shell-command-to-string "git diff --cached --name-only") "\n" t))
+         (current-commit-sha (substring (shell-command-to-string "git rev-parse HEAD") 0 7))
+         (project-root (substring (shell-command-to-string "git rev-parse --show-toplevel") 0 -1)) ;; 获取 Git 项目根目录
+         (file-contents (mapcar (lambda (file)
+                                  (with-temp-buffer
+                                    (insert-file-contents (expand-file-name file project-root))
+                                    (buffer-string)))
+                                staged-files)))
+    (if staged-files
+        (progn
+          (gptel-request
+              (format "请帮我详细评审一下代码修改, 注意拼写错误,命名, 逻辑错误, :\n\n%s\n\nFile contents:\n\n%s"
+                      (mapconcat 'identity staged-files "\n")
+                      (mapconcat 'identity file-contents "\n\n"))
+            :stream t
+            :callback (lambda (response info)
+                        (if (not response)
+                            (message "gptel-lookup failed with message: %s" (plist-get info :status))
+                          (cond
+                           ((stringp response)
+                            (with-current-buffer (get-buffer-create "*gptel-review*")
+                              (let ((inhibit-read-only t))
+                                (insert response)
+                                (goto-char (point-max)))
+                              (special-mode)
+                              (display-buffer (current-buffer)
+                                              `((display-buffer-in-side-window)
+                                                (side . bottom)
+                                                (window-height . ,#'fit-window-to-buffer)))))
+                           ((equal t response)
+                            (message "评审完成")))))))
+      (message "No staged files found."))))
 
 ;;marvin-end
 
