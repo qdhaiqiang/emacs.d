@@ -15,7 +15,7 @@
 (require-package 'git-link)
 
 (when (maybe-require-package 'magit)
-  (setq-default magit-diff-refine-hunk 'all)
+  (setq-default magit-diff-refine-hunk t)
 
   ;; Hint: customize `magit-repository-directories' so that you can use C-u M-F12 to
   ;; quickly open magit on any one of your projects.
@@ -45,6 +45,8 @@
 (with-eval-after-load 'magit
   (fullframe magit-status magit-mode-quit-window))
 
+(when (maybe-require-package 'git-commit)
+  (add-hook 'git-commit-mode-hook 'goto-address-mode))
 
 
 (when *is-a-mac*

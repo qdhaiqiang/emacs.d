@@ -17,7 +17,6 @@ CVS
 cookies
 /newsticker
 \#*
-/tree-sitter
 /elpa
 /elpa-*
 site-lisp/package/
@@ -55,4 +54,15 @@ site-lisp/package/
 /.lsp-session-v1
 /smex-items
 /eln-cache/
+/places
+/cnfonts/
+/url/
 /projects
+/projectile.cache
+<<<<<<< HEAD
+=======
+/cnfonts/
+/url/
+>>>>>>> dc2a0d1 (update)
+/eww-bookmarks
+/nov-places

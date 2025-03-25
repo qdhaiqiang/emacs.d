@@ -68,7 +68,7 @@
 (require 'init-hippie-expand)
 (require 'init-corfu)
 (require 'init-windows)
-;;(require 'init-sessions)
+(require 'init-sessions)
 (require 'init-mmm)
 
 (require 'init-editing-utils)
@@ -128,13 +128,14 @@
 (require 'init-folding)
 (require 'init-dash)
 
+;;(require 'init-twitter)
+;; (require 'init-mu)
 (require 'init-ledger)
-(require 'init-lua)
-
 ;; Extra packages which don't require any configuration
 
 (require-package 'sudo-edit)
 (require-package 'gnuplot)
+(require-package 'lua-mode)
 (require-package 'htmlize)
 (when *is-a-mac*
   (require-package 'osx-location))

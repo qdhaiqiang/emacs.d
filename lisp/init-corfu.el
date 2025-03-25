@@ -21,15 +21,9 @@
   (setq-default corfu-quit-no-match 'separator)
   (add-hook 'after-init-hook 'global-corfu-mode)
 
-
-
-  (with-eval-after-load 'corfu
-    (corfu-popupinfo-mode))
-
-  ;; Make Corfu also work in terminals, without disturbing usual behaviour in GUI
-  (when (maybe-require-package 'corfu-terminal)
+  (when (maybe-require-package 'corfu-doc)
     (with-eval-after-load 'corfu
-      (corfu-terminal-mode)))
+      (add-hook 'corfu-mode-hook #'corfu-doc-mode)))
 
   ;; TODO: https://github.com/jdtsmith/kind-icon
   )
