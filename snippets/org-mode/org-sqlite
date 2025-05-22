@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: org-sqlite
+# key: sqlite
+# --
+#+BEGIN_SRC sqlite :colnames yes :list :db $1
+    $2
+#+END_SRC

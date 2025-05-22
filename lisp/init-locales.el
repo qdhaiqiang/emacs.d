@@ -10,6 +10,11 @@
 (unless (eq system-type 'windows-nt)
   (set-selection-coding-system 'utf-8))
 
+(setq url-proxy-services
+      '(("http". "127.0.0.1:1082")
+        ("sock5". "127.0.0.1:1082")
+        ("https". "127.0.0.1:1082")))
+
 
 ;;marvin-start
 ;;允许下载远程文件
@@ -43,6 +48,7 @@
   :init (global-undo-tree-mode)
   :custom
   (undo-tree-auto-save-history nil))
+
 
 ;;删除快捷键
 ;;(define-key org-mode-map (kbd "M-c") nil)
@@ -124,7 +130,7 @@
 (setq make-backup-files nil)
 
 ;; 默认启动后最大化
-;;(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;;按f11让Emacs进入全屏显示
 ;;参考： http://www.emacswiki.org/cgi-bin/wiki/FullScreen
@@ -133,7 +139,7 @@
   (set-frame-parameter nil 'fullscreen
                        (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
 ;; 默认启动进入全屏
-(fullscreen)
+;;(fullscreen)
 
 ;; 中文对齐
 (require-package 'cnfonts)
@@ -147,9 +153,11 @@
 (global-page-break-lines-mode)
 (add-hook 'clojure-mode-hook
           (lambda ()
+            (lsp)
             (page-break-lines-mode)))
 (add-hook 'clojurescript-mode-hook
           (lambda ()
+            (lsp)
             (page-break-lines-mode)))
 
 ;; 映射全角字符到半角字符
@@ -344,6 +352,7 @@
    (emacs-lisp . t)
    (matlab . t)
    (C . t)
+   (sqlite . t)
    (perl . t)
    (shell . t)
    (python . t)
@@ -560,7 +569,7 @@
   (company-idle-delay 0.5) ;; 弹层延迟显示时长
   ;; (company-begin-commands nil) ;; 取消注释可以禁用弹层
   :bind
-  (:map compnay-active-map
+  (:map company-active-map
         ("C-n". company-select-next)
         ("C-p". company-select-previous)
         ("M-<". company-select-first)
@@ -604,6 +613,9 @@
 (use-package lsp-mode
   :ensure
   :commands lsp
+  :hook ((clojure-mode . lsp)
+         (clojurescript-mode . lsp)
+         (clojurec-mode . lsp))
   :custom
   ;; 保存时使用什么进行检查，默认是 "check"，我更推荐 "clippy"
   (lsp-rust-analyzer-cargo-watch-command "clippy")
@@ -621,6 +633,17 @@
   (lsp-ui-sideline-show-hover t)
   (lsp-ui-doc-enable nil))
 
+(add-hook 'clojurec-mode-hook 'lsp)
+
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-minimum-prefix-length 1
+                                        ; lsp-enable-indentation nil ; uncomment to use cider indentation instead of lsp
+                                        ; lsp-enable-completion-at-point nil ; uncomment to use cider completion instead of lsp
+      )
+
+
 
 (setenv "GPTEL_GEMINI_KEY" "AIzaSyDMLtSi8-PrQheEkpRCWT0PyzPP-wPB36A")
 (setenv "GPTEL_GROQ_KEY" "xai-w0okaSYZ8FunldIaJHlEVulfbsbGzmkgl8yEL7eYj7o8ZHG3HY8uSLCWJrx7L18412KfW8uVzwZgTQaZ")
@@ -630,8 +653,8 @@
 ;;(setenv "GPTEL_SILICONFLOW_KEY" "sk-aiuuvkzgiyjfreoirhfyjiweqfsaacwsqgqpfyyubxooyfrs")
 ;;(setenv "GPTEL_DEEPSEEK_KEY" "sk-c925fe142f944751b1d2bffe629bd696")
 ;;marvin
-(setenv "GPTEL_TOGETHER_KEY" "1d5ed6159c537302ceb9ef056d2b4daafd42c557bd954c2b4248e17a4c7a8f68")
 ;;(setenv "GPTEL_GEMINI_KEY" "AIzaSyDncDcmn5jLRzWD0qGfX51RWX3y5qM3Uek")
+(setenv "GPTEL_TOGETHER_KEY" "1d5ed6159c537302ceb9ef056d2b4daafd42c557bd954c2b4248e17a4c7a8f68")
 (setenv "GPTEL_QWEN_KEY" "sk-766f6f492b264f369bf312de82f5afd7")
 (setenv "GPTEL_DEEPSEEK_KEY" "sk-082b867923074ed2b0f420a7ec6af2c4")
 
@@ -733,7 +756,7 @@
   (let ((diff (get-staged-diff)))
     (message "正在生成提交信息...")
     (gptel-request
-     (concat "请直接生成中文的commit message, 要求如下
+        (concat "请直接生成中文的commit message, 要求如下
     1. 使用中文
     2. 使用英文半角标点, 比如`:\",`等
     3. 提交信息简洁明了
@@ -745,8 +768,10 @@
        - [wip] 用于进行中的工作
      5. 有列表详细描述改动的具体内容
     " diff)
-     :stream t
-     )))
+      :stream t
+      )))
 
 
 ;;marvin-end
+
+(provide 'init-locales)
