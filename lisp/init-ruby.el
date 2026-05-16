@@ -67,7 +67,7 @@
 
 
 
-(require-package 'bundler)
+(maybe-require-package 'bundler)
 
 
 (when (maybe-require-package 'yard-mode)

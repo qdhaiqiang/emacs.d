@@ -241,9 +241,9 @@
 ;;https://linux.cn/article-11932-1-rel.html
 
 ;; Or start grip when opening a markdown/org buffer
-(use-package grip-mode
-  :ensure t
-  :config (setq grip-use-grip t))
+(when (locate-library "grip-mode")
+  (use-package grip-mode
+    :config (setq grip-use-grip t)))
 
 
 (set-fontset-font "fontset-default" 'emoji (font-spec :family "Apple Color Emoji") nil 'prepend)
@@ -279,15 +279,15 @@
 
 ;; treeemacs end
 
-;; 启动时打开指定文件
-(find-file "~/git/mine/org-doc/log.org")
+
 
 ;;;代码
 
 ;;java支持：https://segmentfault.com/a/1190000040158765
 (require-package 'lsp-java)
 (require 'ob-sql)
-(use-package ob-rust)
+(when (locate-library "ob-rust")
+  (use-package ob-rust))
 
 ;;删除当前行
 (use-package crux
@@ -333,12 +333,12 @@
 
 ;; 使用org-bullets
 (use-package org-bullets
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  :init
+  (add-hook 'org-mode-hook #'org-bullets-mode))
 ;; 设置 bullet list,可以用UTF-8 Miscellaneous Symbols自己定义
 (setq org-bullets-bullet-list '("☯"  "☷" "◉" "☰" "✤" "☳" "➤" "☀" "★" "⚙" "☭"))
 (setq org-hide-emphasis-markers t)   ;;直接显示语法样式
-(setq org-ellipsis " ▼" )   ;; 折叠时不在显示[...],换个你喜欢的符号
+;;(setq org-ellipsis " ▼" )   ;; 折叠时不在显示[...],换个你喜欢的符号
 
 ;;开启自动折行,防止一行文字的长度超出屏幕范围时，行会继续往右延伸而导致部分内容不可见
 (setq truncate-lines nil)
@@ -557,7 +557,9 @@
 
 ;;;; org-mode setting end
 
-(use-package gptel)
+(use-package gptel
+  :ensure nil
+  :if (locate-library "gptel"))
 
 ;; OPTIONAL configuration
 
@@ -577,7 +579,8 @@
 
 ;; Rust
 (use-package rustic
-  :ensure
+  :ensure nil
+  :if (locate-library "rustic")
   :bind (:map rustic-mod-map
               ("M-j" . lsp-ui-imenu)
               ("M-?" . lsp-find-references)
@@ -604,7 +607,8 @@
 
 ;; cargo.el：Cargo 工具集成
 (use-package cargo
-  :ensure t
+  :ensure nil
+  :if (locate-library "cargo")
   :hook
   (rust-mode . cargo-minor-mode)        ; 在 rust-mode 中启用 cargo
   :config
@@ -626,7 +630,8 @@
   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
 (use-package lsp-ui
-  :ensure
+  :ensure nil
+  :if (locate-library "lsp-ui")
   :commands lsp-ui-mode
   :custom
   (lsp-ui-peek-always-show t)
@@ -658,9 +663,11 @@
 (setenv "GPTEL_QWEN_KEY" "sk-766f6f492b264f369bf312de82f5afd7")
 (setenv "GPTEL_DEEPSEEK_KEY" "sk-082b867923074ed2b0f420a7ec6af2c4")
 
-(gptel-make-gemini "Gemini" :key (lambda () (getenv "GPTEL_GEMINI_KEY")) :stream t)
+(when (fboundp 'gptel-make-gemini)
+  (gptel-make-gemini "Gemini" :key (lambda () (getenv "GPTEL_GEMINI_KEY")) :stream t))
 
-(gptel-make-openai "Groq"
+(when (fboundp 'gptel-make-openai)
+  (gptel-make-openai "Groq"
   :host "api.groq.com"
   :endpoint "/openai/v1/chat/completions"
   :stream t
@@ -670,44 +677,49 @@
             llama3-70b-8192
             llama3-8b-8192
             mixtral-8x7b-32768
-            gemma-7b-it))
+            gemma-7b-it)))
 
-(gptel-make-openai "Qwen"
+(when (fboundp 'gptel-make-openai)
+  (gptel-make-openai "Qwen"
   :host "dashscope.aliyuncs.com"
   :endpoint "/compatible-mode/v1/chat/completions"
   :stream t
   :key (lambda () (getenv "GPTEL_QWEN_KEY"))
-  :models '(qwen-max qwen-plus deepseek-v3 deepseek-r1 qwen-turbo deepseek-r1-distill-llama-70b))
+  :models '(qwen-max qwen-plus deepseek-v3 deepseek-r1 qwen-turbo deepseek-r1-distill-llama-70b)))
 
-(gptel-make-openai "mistral"
+(when (fboundp 'gptel-make-openai)
+  (gptel-make-openai "mistral"
   :host "api.mistral.ai"
   :endpoint "/v1/chat/completions"
   :stream t
   :key (lambda () (getenv "GPTEL_MISTRAL_KEY"))
-  :models '(mistral-large-latest))
+  :models '(mistral-large-latest)))
 
-(gptel-make-openai "Together"
+(when (fboundp 'gptel-make-openai)
+  (gptel-make-openai "Together"
   :host "api.together.xyz"
   :endpoint "/v1/chat/completions"
   :stream t
   :key (lambda () (getenv "GPTEL_TOGETHER_KEY"))
-  :models '(deepseek-ai/DeepSeek-V3))
+  :models '(deepseek-ai/DeepSeek-V3)))
 
-(gptel-make-openai "siliconflow"
+(when (fboundp 'gptel-make-openai)
+  (gptel-make-openai "siliconflow"
   :host "api.siliconflow.cn"
   :endpoint "/v1/chat/completions"
   :stream t
   :key (lambda () (getenv "GPTEL_SILICONFLOW_KEY"))
-  :models '(deepseek-ai/DeepSeek-V3 deepseek-ai/DeepSeek-R1))
+  :models '(deepseek-ai/DeepSeek-V3 deepseek-ai/DeepSeek-R1)))
 
-(setq gptel-model 'deepseek-chat
-      gptel-backend
-      (gptel-make-openai "DeepSeek"
+(setq gptel-model 'deepseek-chat)
+(when (fboundp 'gptel-make-openai)
+  (setq gptel-backend
+        (gptel-make-openai "DeepSeek"
         :host "api.deepseek.com"
         :endpoint "/chat/completions"
         :stream t
         :key (lambda () (getenv "GPTEL_DEEPSEEK_KEY"))
-        :models '(deepseek-chat deepseek-coder)))
+        :models '(deepseek-chat deepseek-coder))))
 
 ;;扩展
 
@@ -773,5 +785,8 @@
 
 
 ;;marvin-end
+
+;; 启动时打开指定文件
+(find-file "~/git/mine/org-doc/journal/log.org")
 
 (provide 'init-locales)
